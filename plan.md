@@ -14,6 +14,7 @@ ig：https://www.instagram.com/pctbsc63/
 fb：https://www.facebook.com/PCTBSC/?locale=zh_TW
 
 db：存放宣傳組的資訊、活動花絮(照片)
+(12/8 19:22 edit) db使用mongodb atlas
 主要是跟報名網站連結
 
 串接LLM
