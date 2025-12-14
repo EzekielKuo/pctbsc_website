@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model KeyVisual {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  url       String
+  publicId  String?  @map("publicId")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("hero")
+}
+
+model CarouselImage {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  url       String
+  publicId  String?  @map("publicId")
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("carousel")
+}
+
+model GalleryImage {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  title              String
+  description        String?
+  imageUrl           String   @map("imageUrl")
+  cloudinaryPublicId String?  @map("cloudinaryPublicId")
+  category           String // 活動花絮 | 歷史常設展 | 宣傳組資訊 | 其他
+  year               Int?
+  date               String?
+  order              Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("gallery")
+}
+
+model InstagramPost {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  url         String // Instagram 貼文 URL
+  name        String? // 貼文名稱（可選）
+  description String? // 貼文文字敘述（自動從 URL 抓取，不可手動編輯）
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("instagram_posts")
+}
+
+model Message {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  author    String?  // 留言者名稱（可選）
+  isPublic  Boolean  @default(true) // 是否公開，預設為公開
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("messages")
+}

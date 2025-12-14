@@ -70,13 +70,13 @@ export default function Footer({ contactInfo, links }: FooterProps) {
               關於我們
             </Typography>
             <Typography variant="body2" color="grey.300">
-              大專聖經神學研究班致力於大專學生的福音工作，透過營會、查經、團契等方式，幫助大學生認識信仰、建立生命。
+              
             </Typography>
           </Grid>
         </Grid>
         <Divider sx={{ borderColor: 'grey.700', mb: 4 }} />
         <Typography variant="body2" align="center" color="grey.400">
-          Copyright ©2018 Campus Evangelical Fellowship All Rights Reserved. ．校園福音團契 版權所有．
+          2025 by Ezekiel
         </Typography>
       </Container>
     </Box>

@@ -57,11 +57,42 @@ export default function Countdown({ targetDate }: CountdownProps) {
   }, [targetDate, mounted]);
 
   const TimeUnit = ({ value, label }: { value: number; label: string }) => (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <Typography variant="h3" component="div" sx={{ fontWeight: 700, fontSize: { xs: '2rem', md: '3rem' } }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        p: { xs: 2, md: 3 },
+        minWidth: { xs: 70, md: 100 },
+        minHeight: { xs: 90, md: 120 },
+        transition: 'transform 0.3s ease',
+        '&:hover': {
+          transform: 'translateY(-4px)',
+        },
+      }}
+    >
+      <Typography
+        variant="h3"
+        component="div"
+        sx={{
+          fontWeight: 700,
+          fontSize: { xs: '2.5rem', md: '3.5rem' },
+          lineHeight: 1.2,
+          textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+        }}
+      >
         {String(value).padStart(2, '0')}
       </Typography>
-      <Typography variant="body1" sx={{ mt: 1, fontSize: { xs: '0.875rem', md: '1rem' } }}>
+      <Typography
+        variant="body1"
+        sx={{
+          mt: 1,
+          fontSize: { xs: '0.875rem', md: '1rem' },
+          fontWeight: 500,
+          letterSpacing: 1,
+        }}
+      >
         {label}
       </Typography>
     </Box>
@@ -70,72 +101,144 @@ export default function Countdown({ targetDate }: CountdownProps) {
   return (
     <Box
       sx={{
-        background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
         color: 'white',
-        py: 6,
+        py: { xs: 3, md: 4 },
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)',
+          pointerEvents: 'none',
+        },
       }}
     >
-      <Container maxWidth="md">
-        <Typography variant="h4" component="h2" align="center" sx={{ mb: 4, fontWeight: 700 }}>
+      <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
+        <Typography
+          variant="h4"
+          component="h2"
+          align="center"
+          sx={{
+            mt: { xs: 2, md: 3 },
+            mb: { xs: 3, md: 5 },
+            fontWeight: 700,
+            fontSize: { xs: '1.75rem', md: '2.125rem' },
+            textShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+            letterSpacing: 2,
+          }}
+        >
           營會倒數
         </Typography>
         {mounted ? (
-          <Grid container spacing={2} justifyContent="center" alignItems="center">
-            <Grid>
+          <Grid container spacing={{ xs: 1.5, md: 2 }} justifyContent="center" alignItems="center">
+            <Grid item>
               <TimeUnit value={timeLeft.days} label="天" />
             </Grid>
-            <Grid>
-              <Typography variant="h4" sx={{ fontWeight: 700, mx: 1 }}>
+            <Grid item>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: 700,
+                  mx: { xs: 0.5, md: 1 },
+                  fontSize: { xs: '1.5rem', md: '2rem' },
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                }}
+              >
                 :
               </Typography>
             </Grid>
-            <Grid>
+            <Grid item>
               <TimeUnit value={timeLeft.hours} label="時" />
             </Grid>
-            <Grid>
-              <Typography variant="h4" sx={{ fontWeight: 700, mx: 1 }}>
+            <Grid item>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: 700,
+                  mx: { xs: 0.5, md: 1 },
+                  fontSize: { xs: '1.5rem', md: '2rem' },
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                }}
+              >
                 :
               </Typography>
             </Grid>
-            <Grid>
+            <Grid item>
               <TimeUnit value={timeLeft.minutes} label="分" />
             </Grid>
-            <Grid>
-              <Typography variant="h4" sx={{ fontWeight: 700, mx: 1 }}>
+            <Grid item>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: 700,
+                  mx: { xs: 0.5, md: 1 },
+                  fontSize: { xs: '1.5rem', md: '2rem' },
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                }}
+              >
                 :
               </Typography>
             </Grid>
-            <Grid>
+            <Grid item>
               <TimeUnit value={timeLeft.seconds} label="秒" />
             </Grid>
           </Grid>
         ) : (
-          <Grid container spacing={2} justifyContent="center" alignItems="center">
-            <Grid>
+          <Grid container spacing={{ xs: 1.5, md: 2 }} justifyContent="center" alignItems="center">
+            <Grid item>
               <TimeUnit value={0} label="天" />
             </Grid>
-            <Grid>
-              <Typography variant="h4" sx={{ fontWeight: 700, mx: 1 }}>
+            <Grid item>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: 700,
+                  mx: { xs: 0.5, md: 1 },
+                  fontSize: { xs: '1.5rem', md: '2rem' },
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                }}
+              >
                 :
               </Typography>
             </Grid>
-            <Grid>
+            <Grid item>
               <TimeUnit value={0} label="時" />
             </Grid>
-            <Grid>
-              <Typography variant="h4" sx={{ fontWeight: 700, mx: 1 }}>
+            <Grid item>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: 700,
+                  mx: { xs: 0.5, md: 1 },
+                  fontSize: { xs: '1.5rem', md: '2rem' },
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                }}
+              >
                 :
               </Typography>
             </Grid>
-            <Grid>
+            <Grid item>
               <TimeUnit value={0} label="分" />
             </Grid>
-            <Grid>
-              <Typography variant="h4" sx={{ fontWeight: 700, mx: 1 }}>
+            <Grid item>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: 700,
+                  mx: { xs: 0.5, md: 1 },
+                  fontSize: { xs: '1.5rem', md: '2rem' },
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                }}
+              >
                 :
               </Typography>
             </Grid>
-            <Grid>
+            <Grid item>
               <TimeUnit value={0} label="秒" />
             </Grid>
           </Grid>

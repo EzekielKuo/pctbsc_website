@@ -68,6 +68,7 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+.cursor/
 *.swp
 *.swo
 
@@ -75,3 +76,5 @@ Thumbs.db
 *.tmp
 *.temp
 .cache/
+
+/lib/generated/prisma
