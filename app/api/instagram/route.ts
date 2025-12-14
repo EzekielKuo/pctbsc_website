@@ -37,7 +37,7 @@ async function fetchInstagramDescription(url: string): Promise<string | null> {
       if (ogMatch && ogMatch[1]) {
         return ogMatch[1].trim();
       }
-      const ldMatch = html.match(/<script[^>]+type=["']application\/ld\+json["'][^>]*>(.*?)<\/script>/is);
+      const ldMatch = html.match(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/i);
       if (ldMatch) {
         try {
           const payload = JSON.parse(ldMatch[1]);

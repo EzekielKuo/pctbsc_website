@@ -69,17 +69,9 @@ pctbsc_website/
 
 ```bash
 yarn install
-```
 
-### 資料庫設定
-
-首次使用前，需要執行 Prisma 遷移來建立資料庫結構：
-
-```bash
-# 生成 Prisma Client
+# Prisma
 npx prisma generate
-
-# 執行資料庫遷移（如果資料庫已存在）
 npx prisma db push
 ```
 
@@ -95,16 +87,12 @@ yarn dev
 
 ```bash
 yarn build
-# 或
-npm run build
 ```
 
 ### 啟動生產伺服器
 
 ```bash
 yarn start
-# 或
-npm start
 ```
 
 ## 開發說明

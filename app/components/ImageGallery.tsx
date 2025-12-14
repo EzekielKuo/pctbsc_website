@@ -17,6 +17,8 @@ import {
   IconButton,
   Chip,
   Stack,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { GalleryImage } from '@/lib/models';
@@ -34,6 +36,11 @@ export default function ImageGallery({
   limit,
   title,
 }: ImageGalleryProps) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  const cols = isMobile ? 1 : isTablet ? 2 : 3;
+  
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -112,7 +119,7 @@ export default function ImageGallery({
 
         <ImageList
           variant="masonry"
-          cols={{ xs: 1, sm: 2, md: 3 }}
+          cols={cols}
           gap={16}
         >
           {images.map((image, index) => (

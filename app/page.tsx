@@ -79,7 +79,7 @@ export default function Home() {
         {/* 主視覺圖片 */}
         <KeyVisual imageUrl={keyVisualUrl} />
         {/* 圖片輪播 */}
-          <ImageCarousel images={carouselImages} height={400} interval={5000} />
+          <ImageCarousel images={carouselImages} height={400} interval={10000} />
 
         {/* 宣傳組資訊 Section */}
         <Promotion title="宣傳組資訊" />

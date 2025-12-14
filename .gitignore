@@ -34,10 +34,6 @@ dist
 *.swp
 *.swo
 *~
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
 
 # debug
 npm-debug.log*
@@ -46,13 +42,14 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 .env*.local
+!.env.example
 
 # vercel
 .vercel
@@ -71,10 +68,14 @@ Thumbs.db
 .cursor/
 *.swp
 *.swo
+*.sublime-project
+*.sublime-workspace
 
 # Temporary files
 *.tmp
 *.temp
 .cache/
 
+# Prisma
 /lib/generated/prisma
+prisma/migrations/

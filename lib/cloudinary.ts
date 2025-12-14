@@ -83,7 +83,7 @@ export async function getCloudinaryResources(options: {
       .max_results(options.maxResults || 500)
       .with_field('context')
       .with_field('tags')
-      .sort_by([{ created_at: 'desc' }])
+      .sort_by('created_at', 'desc')
       .execute();
 
     return result.resources || [];

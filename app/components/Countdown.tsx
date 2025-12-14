@@ -136,10 +136,10 @@ export default function Countdown({ targetDate }: CountdownProps) {
         </Typography>
         {mounted ? (
           <Grid container spacing={{ xs: 1.5, md: 2 }} justifyContent="center" alignItems="center">
-            <Grid item>
+            <Grid size="auto">
               <TimeUnit value={timeLeft.days} label="天" />
             </Grid>
-            <Grid item>
+            <Grid size="auto">
               <Typography
                 variant="h4"
                 sx={{
@@ -152,10 +152,10 @@ export default function Countdown({ targetDate }: CountdownProps) {
                 :
               </Typography>
             </Grid>
-            <Grid item>
+            <Grid size="auto">
               <TimeUnit value={timeLeft.hours} label="時" />
             </Grid>
-            <Grid item>
+            <Grid size="auto">
               <Typography
                 variant="h4"
                 sx={{
@@ -168,10 +168,10 @@ export default function Countdown({ targetDate }: CountdownProps) {
                 :
               </Typography>
             </Grid>
-            <Grid item>
+            <Grid size="auto">
               <TimeUnit value={timeLeft.minutes} label="分" />
             </Grid>
-            <Grid item>
+            <Grid size="auto">
               <Typography
                 variant="h4"
                 sx={{
@@ -184,16 +184,16 @@ export default function Countdown({ targetDate }: CountdownProps) {
                 :
               </Typography>
             </Grid>
-            <Grid item>
+            <Grid size="auto">
               <TimeUnit value={timeLeft.seconds} label="秒" />
             </Grid>
           </Grid>
         ) : (
           <Grid container spacing={{ xs: 1.5, md: 2 }} justifyContent="center" alignItems="center">
-            <Grid item>
+            <Grid size="auto">
               <TimeUnit value={0} label="天" />
             </Grid>
-            <Grid item>
+            <Grid size="auto">
               <Typography
                 variant="h4"
                 sx={{
@@ -206,10 +206,10 @@ export default function Countdown({ targetDate }: CountdownProps) {
                 :
               </Typography>
             </Grid>
-            <Grid item>
+            <Grid size="auto">
               <TimeUnit value={0} label="時" />
             </Grid>
-            <Grid item>
+            <Grid size="auto">
               <Typography
                 variant="h4"
                 sx={{
@@ -222,10 +222,10 @@ export default function Countdown({ targetDate }: CountdownProps) {
                 :
               </Typography>
             </Grid>
-            <Grid item>
+            <Grid size="auto">
               <TimeUnit value={0} label="分" />
             </Grid>
-            <Grid item>
+            <Grid size="auto">
               <Typography
                 variant="h4"
                 sx={{
@@ -238,7 +238,7 @@ export default function Countdown({ targetDate }: CountdownProps) {
                 :
               </Typography>
             </Grid>
-            <Grid item>
+            <Grid size="auto">
               <TimeUnit value={0} label="秒" />
             </Grid>
           </Grid>

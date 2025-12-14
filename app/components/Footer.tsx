@@ -2,6 +2,7 @@
 
 import { Box, Container, Grid, Typography, Link as MuiLink, Divider } from '@mui/material';
 import Link from 'next/link';
+import packageJson from '@/package.json';
 
 interface FooterProps {
   contactInfo: {
@@ -76,7 +77,7 @@ export default function Footer({ contactInfo, links }: FooterProps) {
         </Grid>
         <Divider sx={{ borderColor: 'grey.700', mb: 4 }} />
         <Typography variant="body2" align="center" color="grey.400">
-          2025 by Ezekiel
+          2025 by Ezekiel · v{packageJson.version}
         </Typography>
       </Container>
     </Box>
