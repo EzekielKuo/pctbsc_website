@@ -18,6 +18,7 @@ import {
   ToggleButtonGroup,
 } from '@mui/material';
 import { Send, Trash2, Globe2, Lock } from 'lucide-react';
+import { event } from '@/lib/gtag';
 
 interface Message {
   id: string;
@@ -99,6 +100,15 @@ export default function MessageBoard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin]);
 
+  // 定期自動更新留言列表（每 10 秒檢查一次）
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchMessages();
+    }, 10000); // 10 秒更新一次
+
+    return () => clearInterval(interval);
+  }, [isAdmin]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
@@ -131,6 +141,12 @@ export default function MessageBoard() {
           open: true,
           message: '留言已成功送出！',
           severity: 'success',
+        });
+        // 追蹤 GA4 事件
+        event({
+          action: 'submit',
+          category: 'message',
+          label: isPublic ? '公開留言' : '不公開留言',
         });
         // 刷新留言列表
         fetchMessages();

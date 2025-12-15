@@ -3,6 +3,7 @@
 import { Box, Container, Grid, Typography, Link as MuiLink, Divider } from '@mui/material';
 import Link from 'next/link';
 import packageJson from '@/package.json';
+import { event } from '@/lib/gtag';
 
 interface FooterProps {
   contactInfo: {
@@ -31,6 +32,11 @@ export default function Footer({ contactInfo, links }: FooterProps) {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => event({
+                      action: 'click',
+                      category: 'external_link',
+                      label: link.name,
+                    })}
                     color="grey.300"
                     sx={{
                       textDecoration: 'none',
@@ -55,6 +61,11 @@ export default function Footer({ contactInfo, links }: FooterProps) {
                 E-mail：{' '}
                 <MuiLink
                   href={`mailto:${contactInfo.email}`}
+                  onClick={() => event({
+                    action: 'click',
+                    category: 'contact',
+                    label: 'Email',
+                  })}
                   color="grey.300"
                   sx={{
                     textDecoration: 'none',

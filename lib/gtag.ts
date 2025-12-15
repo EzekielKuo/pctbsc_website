@@ -44,3 +44,19 @@ export const event = ({
   }
 };
 
+// 設定使用者 ID（用於追蹤登入用戶）
+export const setUserId = (userId: string | null) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    if (userId) {
+      window.gtag('config', GA_MEASUREMENT_ID || '', {
+        user_id: userId,
+      });
+    } else {
+      // 清除使用者 ID
+      window.gtag('config', GA_MEASUREMENT_ID || '', {
+        user_id: null,
+      });
+    }
+  }
+};
+

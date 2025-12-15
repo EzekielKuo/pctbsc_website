@@ -5,6 +5,7 @@ import Footer from '../../components/Footer';
 import KeyVisual from '../../components/KeyVisual';
 import { Box, Container, Typography, Paper, Divider } from '@mui/material';
 import { useState, useEffect } from 'react';
+import { event } from '@/lib/gtag';
 
 export default function InfoPage() {
   const [keyVisualUrl, setKeyVisualUrl] = useState<string | null>(null);
@@ -77,6 +78,11 @@ export default function InfoPage() {
                   href="https://acts.pct.org.tw/djactive/ActDetails.aspx?ActID=2510121303INL05T"
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => event({
+                    action: 'click',
+                    category: 'external_link',
+                    label: '活動資訊頁面-報名連結',
+                  })}
                   style={{ color: '#ff6b35', textDecoration: 'none', marginLeft: '8px' }}
                 >
                   https://acts.pct.org.tw/djactive/ActDetails.aspx?ActID=2510121303INL05T

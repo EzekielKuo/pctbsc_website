@@ -15,6 +15,7 @@ import {
   Stack,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { event } from '@/lib/gtag';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -36,10 +37,18 @@ export default function LoginPage() {
     if (isAdmin || isGuest) {
       // 登入成功，儲存登入狀態和時間戳記
       const loginTime = Date.now();
+      const loggedInUsername = isAdmin ? 'admin' : username;
       localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('username', isAdmin ? 'admin' : username);
+      localStorage.setItem('username', loggedInUsername);
       localStorage.setItem('isAdmin', isAdmin ? 'true' : 'false');
       localStorage.setItem('loginTime', loginTime.toString());
+      
+      // 追蹤登入成功
+      event({
+        action: 'login',
+        category: 'authentication',
+        label: 'success',
+      });
       
       // 延遲一下再跳轉，讓使用者看到成功訊息
       setTimeout(() => {
@@ -47,6 +56,12 @@ export default function LoginPage() {
         router.refresh();
       }, 500);
     } else {
+      // 追蹤登入失敗
+      event({
+        action: 'login',
+        category: 'authentication',
+        label: 'failure',
+      });
       setError('帳號或密碼錯誤');
       setLoading(false);
     }

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Box, Container, Typography } from '@mui/material';
 import { Image as ImageIcon } from 'lucide-react';
+import { event } from '@/lib/gtag';
 
 interface ImageCarouselProps {
   images: string[];
@@ -19,13 +20,25 @@ export default function ImageCarousel({
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // 重置計時器的函數
-  const resetTimer = () => {
+  const resetTimer = (isAuto: boolean = true) => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
     if (images.length > 1) {
       timerRef.current = setInterval(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+        setCurrentIndex((prevIndex) => {
+          const nextIndex = (prevIndex + 1) % images.length;
+          // 追蹤自動切換
+          if (isAuto) {
+            event({
+              action: 'carousel_switch',
+              category: 'carousel',
+              label: 'auto',
+              value: nextIndex + 1, // 圖片編號（從1開始）
+            });
+          }
+          return nextIndex;
+        });
       }, interval);
     }
   };
@@ -33,7 +46,7 @@ export default function ImageCarousel({
   useEffect(() => {
     if (images.length === 0) return;
 
-    resetTimer();
+    resetTimer(true); // 初始化時使用自動切換
 
     return () => {
       if (timerRef.current) {
@@ -62,7 +75,15 @@ export default function ImageCarousel({
 
   const handleDotClick = (index: number) => {
     setCurrentIndex(index);
-    resetTimer(); // 點擊原點時重置計時器
+    resetTimer(false); // 點擊原點時重置計時器（不追蹤自動切換）
+    
+    // 追蹤指示器點擊
+    event({
+      action: 'carousel_click',
+      category: 'carousel',
+      label: 'indicator',
+      value: index + 1, // 圖片編號（從1開始）
+    });
   };
 
   return (

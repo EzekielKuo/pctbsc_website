@@ -25,6 +25,7 @@ import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import { useTheme } from '@mui/material/styles';
+import { event } from '@/lib/gtag';
 
 interface NavigationProps {
   currentPage?: string;
@@ -90,7 +91,21 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
     };
   }, []);
 
+  // 追蹤導覽連結點擊
+  const trackNavigationClick = useCallback((label: string, type: 'internal' | 'external' = 'internal') => {
+    event({
+      action: 'click',
+      category: type === 'internal' ? 'navigation' : 'external_link',
+      label: label,
+    });
+  }, []);
+
   const handleLogout = useCallback(() => {
+    event({
+      action: 'click',
+      category: 'button',
+      label: '登出',
+    });
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('username');
     localStorage.removeItem('loginTime');
@@ -216,17 +231,29 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
           <ListItemText primary="關於神研班" />
         </ListItem>
         <ListItem sx={{ pl: 4 }}>
-          <Link href="/about" onClick={handleDrawerToggle} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+          <Link 
+            href="/about" 
+            onClick={() => { trackNavigationClick('營隊介紹'); handleDrawerToggle(); }} 
+            style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+          >
             <ListItemText primary="營隊介紹" />
           </Link>
         </ListItem>
         <ListItem sx={{ pl: 4 }}>
-          <Link href="/about/timeline" onClick={handleDrawerToggle} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+          <Link 
+            href="/about/timeline" 
+            onClick={() => { trackNavigationClick('重要時程'); handleDrawerToggle(); }} 
+            style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+          >
             <ListItemText primary="重要時程" />
           </Link>
         </ListItem>
         <ListItem sx={{ pl: 4 }}>
-          <Link href="/faq" onClick={handleDrawerToggle} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+          <Link 
+            href="/faq" 
+            onClick={() => { trackNavigationClick('FAQ'); handleDrawerToggle(); }} 
+            style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+          >
             <ListItemText primary="FAQ" />
           </Link>
         </ListItem>
@@ -234,22 +261,38 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
           <ListItemText primary="神研前輩訪談" />
         </ListItem>
         <ListItem sx={{ pl: 4 }}>
-          <Link href="/interview" onClick={handleDrawerToggle} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+          <Link 
+            href="/interview" 
+            onClick={() => { trackNavigationClick('緣起'); handleDrawerToggle(); }} 
+            style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+          >
             <ListItemText primary="緣起" />
           </Link>
         </ListItem>
         <ListItem sx={{ pl: 4 }}>
-          <Link href="/interview/chen-nan-zhou" onClick={handleDrawerToggle} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+          <Link 
+            href="/interview/chen-nan-zhou" 
+            onClick={() => { trackNavigationClick('第1-7屆｜陳南州牧師'); handleDrawerToggle(); }} 
+            style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+          >
             <ListItemText primary="第1-7屆｜陳南州牧師" />
           </Link>
         </ListItem>
         <ListItem sx={{ pl: 4 }}>
-          <Link href="/interview/huang-chun-sheng" onClick={handleDrawerToggle} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+          <Link 
+            href="/interview/huang-chun-sheng" 
+            onClick={() => { trackNavigationClick('第20屆後｜黃春生牧師'); handleDrawerToggle(); }} 
+            style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+          >
             <ListItemText primary="第20屆後｜黃春生牧師" />
           </Link>
         </ListItem>
         <ListItem sx={{ pl: 4 }}>
-          <Link href="/interview/huang-hsu-hui" onClick={handleDrawerToggle} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+          <Link 
+            href="/interview/huang-hsu-hui" 
+            onClick={() => { trackNavigationClick('第50屆後｜黃敍慧姊妹'); handleDrawerToggle(); }} 
+            style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+          >
             <ListItemText primary="第50屆後｜黃敍慧姊妹" />
           </Link>
         </ListItem>
@@ -257,17 +300,29 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
           <ListItemText primary="63神研" />
         </ListItem>
         <ListItem sx={{ pl: 4 }}>
-          <Link href="/63bsc/theme" onClick={handleDrawerToggle} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+          <Link 
+            href="/63bsc/theme" 
+            onClick={() => { trackNavigationClick('神研班主題'); handleDrawerToggle(); }} 
+            style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+          >
             <ListItemText primary="神研班主題" />
           </Link>
         </ListItem>
         <ListItem sx={{ pl: 4 }}>
-          <Link href="/63bsc/info" onClick={handleDrawerToggle} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+          <Link 
+            href="/63bsc/info" 
+            onClick={() => { trackNavigationClick('活動資訊'); handleDrawerToggle(); }} 
+            style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+          >
             <ListItemText primary="活動資訊" />
           </Link>
         </ListItem>
         <ListItem sx={{ pl: 4 }}>
-          <Link href="/63bsc/schedule" onClick={handleDrawerToggle} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+          <Link 
+            href="/63bsc/schedule" 
+            onClick={() => { trackNavigationClick('活動日程表'); handleDrawerToggle(); }} 
+            style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+          >
             <ListItemText primary="活動日程表" />
           </Link>
         </ListItem>
@@ -316,7 +371,11 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
           </>
         ) : (
           <ListItem>
-            <Link href="/login" onClick={handleDrawerToggle} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+            <Link 
+              href="/login" 
+              onClick={() => { trackNavigationClick('登入'); handleDrawerToggle(); }} 
+              style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+            >
               <ListItemText primary="登入" />
             </Link>
           </ListItem>
@@ -348,6 +407,7 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
           >
             <Link
               href="/"
+              onClick={() => trackNavigationClick('首頁 Logo')}
               style={{
                 textDecoration: 'none',
               }}
@@ -440,7 +500,11 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                     },
                   }}
                 >
-                  <Link href="/about" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                  <Link 
+                    href="/about" 
+                    onClick={() => trackNavigationClick('營隊介紹')}
+                    style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+                  >
                     營隊介紹
                   </Link>
                 </MenuItem>
@@ -454,7 +518,11 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                     },
                   }}
                 >
-                  <Link href="/about/timeline" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                  <Link 
+                    href="/about/timeline" 
+                    onClick={() => trackNavigationClick('重要時程')}
+                    style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+                  >
                     重要時程
                   </Link>
                 </MenuItem>
@@ -468,7 +536,11 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                     },
                   }}
                 >
-                  <Link href="/faq" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                  <Link 
+                    href="/faq" 
+                    onClick={() => trackNavigationClick('FAQ')}
+                    style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+                  >
                     FAQ(尚未實作)
                   </Link>
                 </MenuItem>
@@ -538,7 +610,11 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                     },
                   }}
                 >
-                  <Link href="/interview" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                  <Link 
+                    href="/interview" 
+                    onClick={() => trackNavigationClick('緣起')}
+                    style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+                  >
                     緣起
                   </Link>
                 </MenuItem>
@@ -650,7 +726,11 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                     },
                   }}
                 >
-                  <Link href="/63bsc/theme" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                  <Link 
+                    href="/63bsc/theme" 
+                    onClick={() => trackNavigationClick('神研班主題')}
+                    style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+                  >
                     神研班主題
                   </Link>
                 </MenuItem>
@@ -664,7 +744,11 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                     },
                   }}
                 >
-                  <Link href="/63bsc/info" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                  <Link 
+                    href="/63bsc/info" 
+                    onClick={() => trackNavigationClick('活動資訊')}
+                    style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+                  >
                     活動資訊
                   </Link>
                 </MenuItem>
@@ -678,7 +762,11 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                     },
                   }}
                 >
-                  <Link href="/63bsc/schedule" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                  <Link 
+                    href="/63bsc/schedule" 
+                    onClick={() => trackNavigationClick('活動日程表')}
+                    style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}
+                  >
                     活動日程表
                   </Link>
                 </MenuItem>
@@ -691,6 +779,7 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
               href="https://acts.pct.org.tw/djactive/ActDetails.aspx?ActID=2510121303INL05T"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackNavigationClick('報名網站', 'external')}
               sx={{
                 textTransform: 'none',
                 color: textColor,
@@ -714,6 +803,7 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                 href="https://www.facebook.com/PCTBSC/?locale=zh_TW"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackNavigationClick('Facebook', 'external')}
                 size="small"
                 sx={{
                   width: 40,
@@ -736,6 +826,7 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                 href="https://www.instagram.com/pctbsc63/"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackNavigationClick('Instagram', 'external')}
                 size="small"
                 sx={{
                   width: 40,
@@ -898,7 +989,11 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                   </Box>
                 </>
               ) : (
-                <Link href="/login" style={{ textDecoration: 'none' }}>
+                <Link 
+                  href="/login" 
+                  onClick={() => trackNavigationClick('登入')}
+                  style={{ textDecoration: 'none' }}
+                >
                   <IconButton
                     sx={{
                       width: 40,

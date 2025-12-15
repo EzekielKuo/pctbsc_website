@@ -3,6 +3,7 @@
 import { Container, Typography, Box, IconButton } from '@mui/material';
 import { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { event } from '@/lib/gtag';
 
 interface InstagramPost {
   id: string;
@@ -76,6 +77,11 @@ export default function Promotion({ title = '宣傳組資訊' }: PromotionProps)
       behavior: 'smooth',
     });
     setScrollPosition(newPosition);
+    event({
+      action: 'click',
+      category: 'carousel',
+      label: 'Instagram 左箭頭',
+    });
   };
 
   const handleNext = () => {
@@ -88,6 +94,11 @@ export default function Promotion({ title = '宣傳組資訊' }: PromotionProps)
       behavior: 'smooth',
     });
     setScrollPosition(newPosition);
+    event({
+      action: 'click',
+      category: 'carousel',
+      label: 'Instagram 右箭頭',
+    });
   };
 
   // 監聽滾動事件

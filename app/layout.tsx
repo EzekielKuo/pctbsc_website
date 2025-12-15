@@ -4,6 +4,10 @@ import './globals.css';
 import ThemeRegistry from './theme/ThemeRegistry';
 import GoogleAnalytics from './components/GoogleAnalytics';
 import PageViewTracker from './components/PageViewTracker';
+import PageTimeTracker from './components/PageTimeTracker';
+import ScrollDepthTracker from './components/ScrollDepthTracker';
+import PageLoadTimeTracker from './components/PageLoadTimeTracker';
+import UserIdTracker from './components/UserIdTracker';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -30,6 +34,10 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <GoogleAnalytics />
         <PageViewTracker />
+        <PageTimeTracker />
+        <ScrollDepthTracker />
+        <PageLoadTimeTracker />
+        <UserIdTracker />
         <ThemeRegistry>{children}</ThemeRegistry>
       </body>
     </html>
