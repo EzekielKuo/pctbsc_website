@@ -3,9 +3,9 @@
 import "dotenv/config";
 import { defineConfig, env } from "prisma/config";
 
-// 確保 DATABASE_URL 存在（從 MONGODB_URI 映射）
-if (!process.env.DATABASE_URL && process.env.MONGODB_URI) {
-  process.env.DATABASE_URL = process.env.MONGODB_URI;
+// 確保 DATABASE_URL 存在
+if (!process.env.DATABASE_URL) {
+  throw new Error('請在環境變數中設定 DATABASE_URL');
 }
 
 export default defineConfig({

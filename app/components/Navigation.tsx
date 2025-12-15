@@ -36,6 +36,7 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
   const [registrationAnchor, setRegistrationAnchor] = useState<null | HTMLElement>(null);
   const [aboutAnchor, setAboutAnchor] = useState<null | HTMLElement>(null);
   const [relatedSitesAnchor, setRelatedSitesAnchor] = useState<null | HTMLElement>(null);
+  const [camp63Anchor, setCamp63Anchor] = useState<null | HTMLElement>(null);
   const [infoAnchor, setInfoAnchor] = useState<null | HTMLElement>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -179,6 +180,7 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
     setRegistrationAnchor(null);
     setAboutAnchor(null);
     setRelatedSitesAnchor(null);
+    setCamp63Anchor(null);
     setInfoAnchor(null);
   };
 
@@ -188,6 +190,10 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
 
   const handleRelatedSitesMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
     setRelatedSitesAnchor(event.currentTarget);
+  };
+
+  const handleCamp63MouseEnter = (event: React.MouseEvent<HTMLElement>) => {
+    setCamp63Anchor(event.currentTarget);
   };
 
   const handleInfoClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -220,11 +226,6 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
           </Link>
         </ListItem>
         <ListItem sx={{ pl: 4 }}>
-          <Link href="https://acts.pct.org.tw/djactive/ActDetails.aspx?ActID=2510121303INL05T" onClick={handleDrawerToggle} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
-            <ListItemText primary="報名資訊" />
-          </Link>
-        </ListItem>
-        <ListItem sx={{ pl: 4 }}>
           <Link href="/faq" onClick={handleDrawerToggle} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
             <ListItemText primary="FAQ" />
           </Link>
@@ -253,8 +254,21 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
           </Link>
         </ListItem>
         <ListItem>
-          <Link href="https://acts.pct.org.tw/djactive/ActDetails.aspx?ActID=2510121303INL05T" onClick={handleDrawerToggle} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
-            <ListItemText primary="報名資訊" />
+          <ListItemText primary="63神研" />
+        </ListItem>
+        <ListItem sx={{ pl: 4 }}>
+          <Link href="/63bsc/theme" onClick={handleDrawerToggle} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+            <ListItemText primary="神研班主題" />
+          </Link>
+        </ListItem>
+        <ListItem sx={{ pl: 4 }}>
+          <Link href="/63bsc/info" onClick={handleDrawerToggle} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+            <ListItemText primary="活動資訊" />
+          </Link>
+        </ListItem>
+        <ListItem sx={{ pl: 4 }}>
+          <Link href="/63bsc/schedule" onClick={handleDrawerToggle} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+            <ListItemText primary="活動日程表" />
           </Link>
         </ListItem>
         {isLoggedIn ? (
@@ -282,16 +296,6 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
               sx={{ pl: 4 }}
             >
               <ListItemText primary="62神研班雲端" />
-            </ListItem>
-            <ListItem
-              component="a"
-              href="https://acts.pct.org.tw/djactive/ActDetails.aspx?ActID=2510121303INL05T"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={handleDrawerToggle}
-              sx={{ pl: 4 }}
-            >
-              <ListItemText primary="活動報名網站" />
             </ListItem>
             <Divider />
             <ListItem
@@ -335,8 +339,11 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
         <Toolbar>
           <Box
             sx={{
-              flexGrow: { xs: 1, md: 0 },
-              mr: { md: 4 },
+              flexGrow: 1,
+              '@media (min-width: 800px)': {
+                flexGrow: 0,
+                marginRight: 4,
+              },
             }}
           >
             <Link
@@ -349,7 +356,12 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                 variant="h6"
                 sx={{
                   fontWeight: 700,
-                  color: 'primary.main',
+                  color: 'white',
+                  cursor: 'pointer',
+                  transition: 'color 0.2s ease',
+                  '&:hover': {
+                    color: '#ff6b35',
+                  },
                 }}
               >
                 63rd神研班
@@ -357,14 +369,32 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
             </Link>
           </Box>
 
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, flexGrow: 1 }}>
+          <Box sx={{ 
+            display: 'none',
+            '@media (min-width: 800px)': {
+              display: 'flex',
+            },
+            gap: 0.25, 
+            flexGrow: 1 
+          }}>
             <Box
               onMouseEnter={handleAboutMouseEnter}
               onMouseLeave={handleClose}
               sx={{ position: 'relative' }}
             >
               <Button
-                sx={{ textTransform: 'none', color: textColor, fontSize: '1rem' }}
+                sx={{ 
+                  textTransform: 'none', 
+                  color: textColor, 
+                  fontSize: '1rem',
+                  px: 1.5,
+                  py: 1,
+                  minHeight: 32,
+                  transition: 'color 0.2s ease',
+                  '&:hover': {
+                    color: '#1976d2',
+                  },
+                }}
               >
                 關於神研班
               </Button>
@@ -400,24 +430,46 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                   },
                 }}
               >
-                <MenuItem onClick={handleClose} sx={{ color: textColor }}>
-                  <Link href="/about" style={{ textDecoration: 'none', color: textColor, width: '100%' }}>
+                <MenuItem 
+                  onClick={handleClose} 
+                  sx={{ 
+                    color: textColor,
+                    transition: 'color 0.2s ease',
+                    '&:hover': {
+                      color: '#1976d2',
+                    },
+                  }}
+                >
+                  <Link href="/about" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
                     營隊介紹
                   </Link>
                 </MenuItem>
-                <MenuItem onClick={handleClose} sx={{ color: textColor }}>
-                  <Link href="/about/timeline" style={{ textDecoration: 'none', color: textColor, width: '100%' }}>
+                <MenuItem 
+                  onClick={handleClose} 
+                  sx={{ 
+                    color: textColor,
+                    transition: 'color 0.2s ease',
+                    '&:hover': {
+                      color: '#1976d2',
+                    },
+                  }}
+                >
+                  <Link href="/about/timeline" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
                     重要時程
                   </Link>
                 </MenuItem>
-                <MenuItem onClick={handleClose} sx={{ color: textColor }}>
-                  <Link href="https://acts.pct.org.tw/djactive/ActDetails.aspx?ActID=2510121303INL05T" style={{ textDecoration: 'none', color: textColor, width: '100%' }} target="_blank" rel="noopener noreferrer">
-                    報名資訊
-                  </Link>
-                </MenuItem>
-                <MenuItem onClick={handleClose} sx={{ color: textColor }}>
-                  <Link href="/faq" style={{ textDecoration: 'none', color: textColor, width: '100%' }}>
-                    FAQ
+                <MenuItem 
+                  onClick={handleClose} 
+                  sx={{ 
+                    color: textColor,
+                    transition: 'color 0.2s ease',
+                    '&:hover': {
+                      color: '#1976d2',
+                    },
+                  }}
+                >
+                  <Link href="/faq" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                    FAQ(尚未實作)
                   </Link>
                 </MenuItem>
               </Menu>
@@ -429,7 +481,18 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
               sx={{ position: 'relative' }}
             >
               <Button
-                sx={{ textTransform: 'none', color: textColor, fontSize: '1rem' }}
+                sx={{ 
+                  textTransform: 'none', 
+                  color: textColor, 
+                  fontSize: '1rem',
+                  px: 1.5,
+                  py: 1,
+                  minHeight: 32,
+                  transition: 'color 0.2s ease',
+                  '&:hover': {
+                    color: '#1976d2',
+                  },
+                }}
               >
                 神研前輩訪談
               </Button>
@@ -465,37 +528,183 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                   },
                 }}
               >
-                <MenuItem onClick={handleClose} sx={{ color: textColor }}>
-                  <Link href="/interview" style={{ textDecoration: 'none', color: textColor, width: '100%' }}>
+                <MenuItem 
+                  onClick={handleClose} 
+                  sx={{ 
+                    color: textColor,
+                    transition: 'color 0.2s ease',
+                    '&:hover': {
+                      color: '#1976d2',
+                    },
+                  }}
+                >
+                  <Link href="/interview" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
                     緣起
                   </Link>
                 </MenuItem>
-                <MenuItem onClick={handleClose} sx={{ color: textColor }}>
-                  <Link href="/interview/chen-nan-zhou" style={{ textDecoration: 'none', color: textColor, width: '100%' }}>
+                <MenuItem 
+                  onClick={handleClose} 
+                  sx={{ 
+                    color: textColor,
+                    transition: 'color 0.2s ease',
+                    '&:hover': {
+                      color: '#1976d2',
+                    },
+                  }}
+                >
+                  <Link href="/interview/chen-nan-zhou" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
                     第1-7屆｜陳南州牧師
                   </Link>
                 </MenuItem>
-                <MenuItem onClick={handleClose} sx={{ color: textColor }}>
-                  <Link href="/interview/huang-chun-sheng" style={{ textDecoration: 'none', color: textColor, width: '100%' }}>
+                <MenuItem 
+                  onClick={handleClose} 
+                  sx={{ 
+                    color: textColor,
+                    transition: 'color 0.2s ease',
+                    '&:hover': {
+                      color: '#1976d2',
+                    },
+                  }}
+                >
+                  <Link href="/interview/huang-chun-sheng" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
                     第20屆後｜黃春生牧師
                   </Link>
                 </MenuItem>
-                <MenuItem onClick={handleClose} sx={{ color: textColor }}>
-                  <Link href="/interview/huang-hsu-hui" style={{ textDecoration: 'none', color: textColor, width: '100%' }}>
+                <MenuItem 
+                  onClick={handleClose} 
+                  sx={{ 
+                    color: textColor,
+                    transition: 'color 0.2s ease',
+                    '&:hover': {
+                      color: '#1976d2',
+                    },
+                  }}
+                >
+                  <Link href="/interview/huang-hsu-hui" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
                     第50屆後｜黃敍慧姊妹
                   </Link>
                 </MenuItem>
               </Menu>
             </Box>
 
+            <Box
+              onMouseEnter={handleCamp63MouseEnter}
+              onMouseLeave={handleClose}
+              sx={{ position: 'relative' }}
+            >
+              <Button
+                sx={{ 
+                  textTransform: 'none', 
+                  color: textColor, 
+                  fontSize: '1rem',
+                  px: 1.5,
+                  py: 1,
+                  minHeight: 32,
+                  transition: 'color 0.2s ease',
+                  '&:hover': {
+                    color: '#1976d2',
+                  },
+                }}
+              >
+                63神研
+              </Button>
+              <Menu
+                anchorEl={camp63Anchor}
+                open={Boolean(camp63Anchor)}
+                onClose={handleClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'center',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'center',
+                }}
+                slotProps={{
+                  paper: {
+                    sx: {
+                      mt: 1,
+                    },
+                  },
+                }}
+                MenuListProps={{
+                  onMouseLeave: handleClose,
+                }}
+                sx={{
+                  pointerEvents: 'none',
+                  '& .MuiPaper-root': {
+                    pointerEvents: 'auto',
+                    bgcolor: 'rgba(0, 0, 0, 0.4)',
+                    backdropFilter: 'blur(10px)',
+                    color: textColor,
+                  },
+                }}
+              >
+                <MenuItem 
+                  onClick={handleClose} 
+                  sx={{ 
+                    color: textColor,
+                    transition: 'color 0.2s ease',
+                    '&:hover': {
+                      color: '#1976d2',
+                    },
+                  }}
+                >
+                  <Link href="/63bsc/theme" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                    神研班主題
+                  </Link>
+                </MenuItem>
+                <MenuItem 
+                  onClick={handleClose} 
+                  sx={{ 
+                    color: textColor,
+                    transition: 'color 0.2s ease',
+                    '&:hover': {
+                      color: '#1976d2',
+                    },
+                  }}
+                >
+                  <Link href="/63bsc/info" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                    活動資訊
+                  </Link>
+                </MenuItem>
+                <MenuItem 
+                  onClick={handleClose} 
+                  sx={{ 
+                    color: textColor,
+                    transition: 'color 0.2s ease',
+                    '&:hover': {
+                      color: '#1976d2',
+                    },
+                  }}
+                >
+                  <Link href="/63bsc/schedule" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                    活動日程表
+                  </Link>
+                </MenuItem>
+              </Menu>
+            </Box>
+
+            {/* 活動報名網站 */}
             <Button
               component="a"
               href="https://acts.pct.org.tw/djactive/ActDetails.aspx?ActID=2510121303INL05T"
               target="_blank"
               rel="noopener noreferrer"
-              sx={{ textTransform: 'none', color: textColor, fontSize: '1rem' }}
+              sx={{
+                textTransform: 'none',
+                color: textColor,
+                fontSize: '1rem',
+                px: 1.5,
+                py: 1,
+                minHeight: 32,
+                transition: 'color 0.2s ease',
+                '&:hover': {
+                  color: '#1976d2',
+                },
+              }}
             >
-              報名資訊
+              報名網站
             </Button>
 
             {/* 社群媒體連結 */}
@@ -513,6 +722,11 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                   borderColor: textColor,
                   borderRadius: '50%',
                   color: textColor,
+                  transition: 'color 0.2s ease, border-color 0.2s ease',
+                  '&:hover': {
+                    color: '#1976d2',
+                    borderColor: '#1976d2',
+                  },
                 }}
               >
                 <FacebookIcon fontSize="small" />
@@ -530,6 +744,11 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                   borderColor: textColor,
                   borderRadius: '50%',
                   color: textColor,
+                  transition: 'color 0.2s ease, border-color 0.2s ease',
+                  '&:hover': {
+                    color: '#1976d2',
+                    borderColor: '#1976d2',
+                  },
                 }}
               >
                 <InstagramIcon fontSize="small" />
@@ -539,108 +758,144 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
             {/* 登入/資訊按鈕 - 移到最右側，固定位置 */}
             <Box 
               sx={{ minWidth: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, flexShrink: 0 }}
-              onMouseEnter={isLoggedIn ? handleInfoClick : undefined}
-              onMouseLeave={isLoggedIn ? handleClose : undefined}
             >
               {isAdmin ? (
-                <Typography variant="caption" sx={{ fontWeight: 600, color: textColor }}>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: '#1976d2' }}>
                   admin
                 </Typography>
               ) : isLoggedIn ? (
-                <Typography variant="caption" sx={{ fontWeight: 600, color: textColor }}>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: '#1976d2' }}>
                   user
                 </Typography>
               ) : null}
               {isLoggedIn ? (
                 <>
-                  <IconButton
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      color: textColor,
-                    }}
+                  <Box
+                    onMouseEnter={handleInfoClick}
+                    onMouseLeave={handleClose}
+                    sx={{ position: 'relative' }}
                   >
-                    <MenuOpenIcon />
-                  </IconButton>
-                  <Menu
-                    anchorEl={infoAnchor}
-                    open={Boolean(infoAnchor)}
-                    onClose={handleClose}
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    }}
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'center',
-                    }}
-                    slotProps={{
-                      paper: {
-                        sx: {
-                          mt: 1.5,
-                        },
-                      },
-                    }}
-                    MenuListProps={{
-                      onMouseLeave: handleClose,
-                    }}
-                    sx={{
-                      pointerEvents: 'none',
-                      '& .MuiPaper-root': {
-                        pointerEvents: 'auto',
-                        bgcolor: 'rgba(0, 0, 0, 0.4)',
-                        backdropFilter: 'blur(10px)',
+                    <IconButton
+                      sx={{
+                        width: 40,
+                        height: 40,
                         color: textColor,
-                      },
-                    }}
-                  >
-                    <MenuItem
-                      onClick={handleClose}
-                      component={Link}
-                      href="/edit"
-                      sx={{ color: textColor }}
+                        transition: 'color 0.2s ease',
+                        '&:hover': {
+                          color: '#1976d2',
+                        },
+                      }}
                     >
-                      網頁設定
-                    </MenuItem>
-                    <MenuItem onClick={handleClose} sx={{ color: textColor }}>
-                      網頁設定指南
-                    </MenuItem>
-                    <Divider sx={{ bgcolor: textColor === 'white' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)', my: 0.5 }} />
-                    <MenuItem
-                      onClick={handleClose}
-                      component="a"
-                      href="https://drive.google.com/drive/u/0/folders/1Ah9bEKb-7GkzvWoMnGbxp0ijOi1-6_YO"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      sx={{ color: textColor }}
+                      <MenuOpenIcon />
+                    </IconButton>
+                    <Menu
+                      anchorEl={infoAnchor}
+                      open={Boolean(infoAnchor)}
+                      onClose={handleClose}
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                      }}
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                      }}
+                      slotProps={{
+                        paper: {
+                          sx: {
+                            mt: 1.5,
+                          },
+                          onMouseEnter: () => {},
+                          onMouseLeave: handleClose,
+                        },
+                      }}
+                      MenuListProps={{
+                        onMouseLeave: handleClose,
+                      }}
+                      sx={{
+                        pointerEvents: 'none',
+                        '& .MuiPaper-root': {
+                          pointerEvents: 'auto',
+                          bgcolor: 'rgba(0, 0, 0, 0.4)',
+                          backdropFilter: 'blur(10px)',
+                          color: textColor,
+                        },
+                      }}
                     >
-                      63神研班雲端
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleClose}
-                      component="a"
-                      href="https://drive.google.com/drive/folders/1eg74jSgVXo0ilXmmrYEEs7pc3c_nWEoH"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      sx={{ color: textColor }}
-                    >
-                      62神研班雲端
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleClose}
-                      component="a"
-                      href="https://acts.pct.org.tw/djactive/ActDetails.aspx?ActID=2510121303INL05T"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      sx={{ color: textColor }}
-                    >
-                      活動報名網站
-                    </MenuItem>
-                    <Divider sx={{ bgcolor: textColor === 'white' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)', my: 0.5 }} />
-                    <MenuItem onClick={handleLogout} sx={{ color: textColor }}>
-                      登出
-                    </MenuItem>
-                  </Menu>
+                      <MenuItem
+                        onClick={handleClose}
+                        component={Link}
+                        href="/edit"
+                        sx={{ 
+                          color: textColor,
+                          transition: 'color 0.2s ease',
+                          '&:hover': {
+                            color: '#1976d2',
+                          },
+                        }}
+                      >
+                        網頁設定
+                      </MenuItem>
+                      <MenuItem 
+                        onClick={handleClose} 
+                        sx={{ 
+                          color: textColor,
+                          transition: 'color 0.2s ease',
+                          '&:hover': {
+                            color: '#1976d2',
+                          },
+                        }}
+                      >
+                        網頁設定指南(尚未實作)
+                      </MenuItem>
+                      <Divider sx={{ bgcolor: textColor === 'white' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)', my: 0.5 }} />
+                      <MenuItem
+                        onClick={handleClose}
+                        component="a"
+                        href="https://drive.google.com/drive/u/0/folders/1Ah9bEKb-7GkzvWoMnGbxp0ijOi1-6_YO"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{ 
+                          color: textColor,
+                          transition: 'color 0.2s ease',
+                          '&:hover': {
+                            color: '#1976d2',
+                          },
+                        }}
+                      >
+                        63神研班雲端
+                      </MenuItem>
+                      <MenuItem
+                        onClick={handleClose}
+                        component="a"
+                        href="https://drive.google.com/drive/folders/1eg74jSgVXo0ilXmmrYEEs7pc3c_nWEoH"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{ 
+                          color: textColor,
+                          transition: 'color 0.2s ease',
+                          '&:hover': {
+                            color: '#1976d2',
+                          },
+                        }}
+                      >
+                        62神研班雲端
+                      </MenuItem>
+                      <Divider sx={{ bgcolor: textColor === 'white' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)', my: 0.5 }} />
+                      <MenuItem 
+                        onClick={handleLogout} 
+                        sx={{ 
+                          color: textColor,
+                          transition: 'color 0.2s ease',
+                          '&:hover': {
+                            color: '#1976d2',
+                          },
+                        }}
+                      >
+                        登出
+                      </MenuItem>
+                    </Menu>
+                  </Box>
                 </>
               ) : (
                 <Link href="/login" style={{ textDecoration: 'none' }}>
@@ -649,6 +904,10 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                       width: 40,
                       height: 40,
                       color: textColor,
+                      transition: 'color 0.2s ease',
+                      '&:hover': {
+                        color: '#1976d2',
+                      },
                     }}
                   >
                     <MenuOpenIcon />
@@ -662,7 +921,17 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ display: { md: 'none' }, color: textColor }}
+            sx={{ 
+              display: 'block',
+              '@media (min-width: 800px)': {
+                display: 'none',
+              },
+              color: textColor,
+              transition: 'color 0.2s ease',
+              '&:hover': {
+                color: '#1976d2',
+              },
+            }}
           >
             <MenuIcon />
           </IconButton>
@@ -677,7 +946,10 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
           keepMounted: true, // Better open performance on mobile.
         }}
         sx={{
-          display: { xs: 'block', md: 'none' },
+          display: 'block',
+          '@media (min-width: 800px)': {
+            display: 'none',
+          },
           '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 250 },
         }}
       >

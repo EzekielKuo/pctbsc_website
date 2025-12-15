@@ -32,11 +32,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 如果沒有提供 order，自動計算最大的 order 值並加 1，讓新照片永遠在最後
+    let finalOrder = order;
+    if (finalOrder === undefined) {
+      const maxOrderImage = await prisma.carouselImage.findFirst({
+        orderBy: { order: 'desc' },
+        select: { order: true },
+      });
+      finalOrder = maxOrderImage ? maxOrderImage.order + 1 : 0;
+    }
+
     const image = await prisma.carouselImage.create({
       data: {
         url,
         publicId: publicId || null,
-        order: order !== undefined ? order : 0,
+        order: finalOrder,
       },
     });
 

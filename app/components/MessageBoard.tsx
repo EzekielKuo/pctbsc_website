@@ -17,10 +17,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
-import DeleteIcon from '@mui/icons-material/Delete';
-import PublicIcon from '@mui/icons-material/Public';
-import LockIcon from '@mui/icons-material/Lock';
+import { Send, Trash2, Globe2, Lock } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -209,6 +206,7 @@ export default function MessageBoard() {
       sx={{
         position: 'relative',
         py: 2,
+        pb: { xs: 4, md: 2 },
         background: 'linear-gradient(to bottom, rgba(255, 182, 193, 0.3), rgba(221, 160, 221, 0.3))',
         backdropFilter: 'blur(10px)',
       }}
@@ -218,14 +216,15 @@ export default function MessageBoard() {
           sx={{
             maxWidth: '1400px',
             mx: 'auto',
-            height: '350px',
+            height: { xs: 'auto', md: '350px' },
+            minHeight: { xs: '350px', md: '350px' },
             display: 'flex',
             gap: 2,
             flexDirection: { xs: 'column', md: 'row' },
           }}
         >
           {/* 左側：新增留言表單 */}
-          <Box sx={{ flex: '1 1 50%', display: 'flex', height: '100%' }}>
+          <Box sx={{ flex: '1 1 50%', display: 'flex', height: { xs: 'auto', md: '100%' }, minHeight: { xs: '200px', md: 'auto' } }}>
             <Paper
               elevation={3}
               sx={{
@@ -271,6 +270,7 @@ export default function MessageBoard() {
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
                       borderColor: 'primary.light',
+                      maxHeight: '180px',
                       '&:hover': {
                         borderColor: 'primary.main',
                       },
@@ -280,6 +280,8 @@ export default function MessageBoard() {
                     },
                     '& .MuiInputBase-input': {
                       resize: 'vertical',
+                      maxHeight: '180px',
+                      overflowY: 'auto',
                     },
                   }}
                 />
@@ -297,32 +299,28 @@ export default function MessageBoard() {
                     size="small"
                   >
                     <ToggleButton value={true} aria-label="公開留言">
-                      <PublicIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
+                      <Globe2 style={{ marginRight: 4, width: 16, height: 16 }} />
                       公開留言
                     </ToggleButton>
                     <ToggleButton value={false} aria-label="不公開留言">
-                      <LockIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
+                      <Lock style={{ marginRight: 4, width: 16, height: 16 }} />
                       不公開留言
                     </ToggleButton>
                   </ToggleButtonGroup>
                   <Button
                     type="submit"
-                    variant="contained"
-                    startIcon={<SendIcon />}
+                    variant="outlined"
+                    size="small"
+                    startIcon={<Send size={16} />}
                     sx={{
-                      bgcolor: 'primary.main',
-                      color: 'white',
-                      px: 3,
-                      py: 1.5,
+                      borderWidth: 2,
+                      px: 2.5,
+                      py: 1,
                       borderRadius: 2,
                       textTransform: 'none',
-                      fontSize: '1rem',
-                      fontWeight: 500,
-                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                      '&:hover': {
-                        bgcolor: 'primary.dark',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-                      },
+                      fontSize: '0.95rem',
+                      fontWeight: 600,
+                      '&:hover': { borderWidth: 2 },
                     }}
                   >
                     Send
@@ -333,7 +331,7 @@ export default function MessageBoard() {
           </Box>
 
           {/* 右側：留言列表 */}
-          <Box sx={{ flex: '1 1 50%', display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <Box sx={{ flex: '1 1 50%', display: 'flex', flexDirection: 'column', height: { xs: 'auto', md: '100%' }, minHeight: { xs: '150px', md: 'auto' } }}>
             <Box
               sx={{
                 flex: 1,
@@ -407,7 +405,7 @@ export default function MessageBoard() {
                             },
                           }}
                         >
-                          <DeleteIcon fontSize="small" />
+                          <Trash2 size={16} />
                         </IconButton>
                       )}
                       {msg.author && (
@@ -443,7 +441,7 @@ export default function MessageBoard() {
                         </Typography>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
                           {!msg.isPublic && (
-                            <LockIcon sx={{ fontSize: '0.875rem', color: 'text.secondary' }} />
+                            <Lock style={{ width: 14, height: 14, color: 'rgba(0,0,0,0.6)' }} />
                           )}
                           <Typography
                             variant="caption"

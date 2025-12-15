@@ -2,8 +2,7 @@
 
 import { Container, Typography, Box, IconButton } from '@mui/material';
 import { useEffect, useState, useRef, useLayoutEffect } from 'react';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface InstagramPost {
   id: string;
@@ -243,7 +242,7 @@ export default function Promotion({ title = '宣傳組資訊' }: PromotionProps)
                 },
               }}
             >
-              <ArrowBackIosNewIcon />
+              <ArrowLeft />
             </IconButton>
 
             {/* 貼文容器 - 可滾動，顯示2.5個貼文 */}
@@ -364,7 +363,7 @@ export default function Promotion({ title = '宣傳組資訊' }: PromotionProps)
                 },
               }}
             >
-              <ArrowForwardIosIcon />
+              <ArrowRight />
             </IconButton>
 
             {/* 可拖動的滾動條 */}

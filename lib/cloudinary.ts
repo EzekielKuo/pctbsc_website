@@ -28,6 +28,7 @@ export async function uploadImageToCloudinary(
         { quality: 'auto' },
         { fetch_format: 'auto' },
       ],
+      timeout: 60000, // 60 秒超時
     });
 
     return {

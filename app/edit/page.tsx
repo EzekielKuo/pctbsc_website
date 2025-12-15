@@ -24,12 +24,7 @@ import {
   TextField,
   Grid,
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import EditIcon from '@mui/icons-material/Edit';
+import { Trash2, Plus, ArrowLeft, ArrowRight, Upload, Edit } from 'lucide-react';
 
 interface CarouselImage {
   id?: string;
@@ -51,6 +46,7 @@ export default function EditPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
   const [keyVisual, setKeyVisual] = useState<{ id?: string; url: string; publicId?: string | null } | null>(null);
+  const [schedule, setSchedule] = useState<{ id?: string; url: string; publicId?: string | null } | null>(null);
   const [images, setImages] = useState<CarouselImage[]>([]);
   const [instagramPosts, setInstagramPosts] = useState<InstagramPost[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -58,6 +54,7 @@ export default function EditPage() {
   const [loadingMessage, setLoadingMessage] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedKeyVisualFile, setSelectedKeyVisualFile] = useState<File | null>(null);
+  const [selectedScheduleFile, setSelectedScheduleFile] = useState<File | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [instagramDialogOpen, setInstagramDialogOpen] = useState(false);
@@ -67,6 +64,8 @@ export default function EditPage() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingImageId, setDeletingImageId] = useState<string | null>(null);
   const [deleteKeyVisualConfirmOpen, setDeleteKeyVisualConfirmOpen] = useState(false);
+  const [deleteScheduleConfirmOpen, setDeleteScheduleConfirmOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null);
 
   useEffect(() => {
     // 檢查登入狀態
@@ -78,6 +77,7 @@ export default function EditPage() {
           router.push('/login');
         } else {
           fetchKeyVisual();
+          fetchSchedule();
           fetchImages();
           fetchInstagramPosts();
         }
@@ -98,6 +98,25 @@ export default function EditPage() {
     } catch (err) {
       console.error('獲取主視覺圖片錯誤:', err);
       setKeyVisual(null);
+    }
+  };
+
+  const handleOpenPreview = (url: string, title: string) => {
+    setPreviewImage({ url, title });
+  };
+
+  const fetchSchedule = async () => {
+    try {
+      const response = await fetch('/api/schedule');
+      const result = await response.json();
+      if (result.success) {
+        setSchedule(result.data || null);
+      } else {
+        setSchedule(null);
+      }
+    } catch (err) {
+      console.error('獲取活動日程表錯誤:', err);
+      setSchedule(null);
     }
   };
 
@@ -232,6 +251,103 @@ export default function EditPage() {
     }
   };
 
+  const handleAddSchedule = () => {
+    setSelectedScheduleFile(null);
+    const input = document.getElementById('upload-schedule-image') as HTMLInputElement;
+    if (input) {
+      input.value = '';
+      input.click();
+    }
+  };
+
+  const handleScheduleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        setError('只能上傳圖片檔案');
+        return;
+      }
+      setSelectedScheduleFile(file);
+      setError('');
+      
+      try {
+        setUploading(true);
+        setLoadingMessage('上傳活動日程表中...');
+        setError('');
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const uploadResponse = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const uploadResult = await uploadResponse.json();
+        if (!uploadResult.success) {
+          setError(uploadResult.error || '上傳失敗');
+          setUploading(false);
+          setLoadingMessage('');
+          return;
+        }
+
+        // 保存活動日程表
+        const saveResponse = await fetch('/api/schedule', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url: uploadResult.data.url,
+            publicId: uploadResult.data.publicId,
+          }),
+        });
+
+        const saveResult = await saveResponse.json();
+        if (saveResult.success) {
+          await fetchSchedule();
+        } else {
+          setError(saveResult.error || '保存失敗');
+        }
+      } catch (err) {
+        console.error('上傳活動日程表錯誤:', err);
+        setError('上傳活動日程表失敗');
+      } finally {
+        setUploading(false);
+        setLoadingMessage('');
+        setSelectedScheduleFile(null);
+      }
+    }
+  };
+
+  const handleDeleteSchedule = () => {
+    setDeleteScheduleConfirmOpen(true);
+  };
+
+  const handleConfirmDeleteSchedule = async () => {
+    if (!schedule?.id) return;
+    
+    setDeleteScheduleConfirmOpen(false);
+
+    try {
+      setDeleting(true);
+      setLoadingMessage('刪除中...');
+      const response = await fetch(`/api/schedule?id=${schedule.id}`, {
+        method: 'DELETE',
+      });
+      const result = await response.json();
+      if (result.success) {
+        await fetchSchedule();
+      } else {
+        setError(result.error || '刪除失敗');
+      }
+    } catch (err) {
+      console.error('刪除活動日程表錯誤:', err);
+      setError('刪除活動日程表失敗');
+    } finally {
+      setDeleting(false);
+      setLoadingMessage('');
+    }
+  };
+
   const handleAddImage = () => {
     setSelectedFile(null);
     // 直接觸發文件選擇，不打開對話框
@@ -270,11 +386,14 @@ export default function EditPage() {
 
         if (uploadResult.success) {
           setLoadingMessage('儲存中...');
-          // 直接保存到資料庫
+          // 直接保存到資料庫（後端會自動將新照片設為最後一張）
           const response = await fetch('/api/carousel', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url: uploadResult.data.url, order: images.length }),
+            body: JSON.stringify({ 
+              url: uploadResult.data.url, 
+              publicId: uploadResult.data.publicId 
+            }),
           });
           const result = await response.json();
           if (result.success) {
@@ -523,63 +642,134 @@ export default function EditPage() {
           )}
 
 
-          {/* 主視覺圖片管理 */}
-          <Paper sx={{ p: 3, mb: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <Typography variant="h6">
-                主視覺圖片管理
-              </Typography>
-              {keyVisual && (
-                <IconButton
-                  color="error"
-                  onClick={handleDeleteKeyVisual}
-                  aria-label="刪除主視覺圖片"
-                >
-                  <DeleteIcon />
-                </IconButton>
-              )}
-            </Box>
-            {keyVisual ? (
-              <Box
-                component="img"
-                src={keyVisual.url}
-                alt="主視覺"
-                sx={{
-                  maxWidth: 400,
-                  width: '100%',
-                  height: 'auto',
-                  borderRadius: 2,
-                  boxShadow: 2,
-                }}
-              />
-            ) : (
-              <Box
-                onClick={handleAddKeyVisual}
-                sx={{
-                  width: '100%',
-                  minHeight: 200,
-                  backgroundColor: 'white',
-                  borderRadius: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  border: '2px dashed rgba(0, 0, 0, 0.3)',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                    borderColor: 'rgba(0, 0, 0, 0.5)',
-                  },
-                }}
-              >
-                <CloudUploadIcon sx={{ fontSize: 48, color: 'rgba(0, 0, 0, 0.5)', mb: 2 }} />
-                <Typography variant="body1" sx={{ color: 'rgba(0, 0, 0, 0.7)' }}>
-                  點擊上傳主視覺圖片
-                </Typography>
-              </Box>
-            )}
-          </Paper>
+          <Grid container spacing={2} sx={{ mb: 3 }}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Paper sx={{ p: 3, height: '100%' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                  <Typography variant="h6">
+                    主視覺圖片管理
+                  </Typography>
+                  {keyVisual && (
+                    <IconButton
+                      color="error"
+                      onClick={handleDeleteKeyVisual}
+                      aria-label="刪除主視覺圖片"
+                    >
+                      <Trash2 />
+                    </IconButton>
+                  )}
+                </Box>
+                {keyVisual ? (
+                  <Box
+                    component="img"
+                    src={keyVisual.url}
+                    alt="主視覺"
+                    onClick={() => handleOpenPreview(keyVisual.url, '主視覺圖片')}
+                    sx={{
+                      width: '100%',
+                      height: 260,
+                      objectFit: 'cover',
+                      borderRadius: 2,
+                      boxShadow: 2,
+                      cursor: 'pointer',
+                    }}
+                  />
+                ) : (
+                  <Box
+                    onClick={handleAddKeyVisual}
+                    sx={{
+                      width: '100%',
+                      minHeight: 200,
+                      backgroundColor: 'white',
+                      borderRadius: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      border: '2px dashed rgba(0, 0, 0, 0.3)',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                        borderColor: 'rgba(0, 0, 0, 0.5)',
+                      },
+                    }}
+                  >
+                    <Box sx={{ mb: 2, color: 'rgba(0, 0, 0, 0.5)' }}>
+                      <Upload size={48} />
+                    </Box>
+                    <Typography variant="body1" sx={{ color: 'rgba(0, 0, 0, 0.7)' }}>
+                      點擊上傳主視覺圖片
+                    </Typography>
+                  </Box>
+                )}
+              </Paper>
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Paper sx={{ p: 3, height: '100%' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                  <Typography variant="h6">
+                    活動日程表管理
+                  </Typography>
+                  {schedule && (
+                    <IconButton
+                      color="error"
+                      onClick={handleDeleteSchedule}
+                      aria-label="刪除活動日程表"
+                    >
+                      <Trash2 />
+                    </IconButton>
+                  )}
+                </Box>
+                {schedule ? (
+                  <Box
+                    component="img"
+                    src={schedule.url}
+                    alt="活動日程表"
+                    onClick={() => handleOpenPreview(schedule.url, '活動日程表')}
+                    sx={{
+                      width: '95%',
+                      height: 260,
+                      objectFit: 'cover',
+                      borderRadius: 2,
+                      boxShadow: 2,
+                      cursor: 'pointer',
+                      mx: 'auto',
+                    }}
+                  />
+                ) : (
+                  <Box
+                    onClick={handleAddSchedule}
+                    sx={{
+                      width: '100%',
+                      minHeight: 200,
+                      backgroundColor: 'white',
+                      borderRadius: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      border: '2px dashed rgba(0, 0, 0, 0.3)',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                        borderColor: 'rgba(0, 0, 0, 0.5)',
+                      },
+                    }}
+                  >
+                    <Box sx={{ mb: 2, color: 'rgba(0, 0, 0, 0.5)' }}>
+                      <Upload size={48} />
+                    </Box>
+                    <Typography variant="body1" sx={{ color: 'rgba(0, 0, 0, 0.7)' }}>
+                      點擊上傳活動日程表
+                    </Typography>
+                  </Box>
+                )}
+              </Paper>
+            </Grid>
+          </Grid>
 
           <Paper sx={{ p: 3, mb: 3 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -587,9 +777,13 @@ export default function EditPage() {
                 輪播圖片管理
               </Typography>
               <Button
-                variant="contained"
-                startIcon={<AddIcon />}
+                variant="outlined"
+                startIcon={<Plus />}
                 onClick={handleAddImage}
+                sx={{
+                  borderWidth: 2,
+                  '&:hover': { borderWidth: 2 },
+                }}
               >
                 新增圖片
               </Button>
@@ -645,7 +839,7 @@ export default function EditPage() {
                           disabled={index === 0}
                           aria-label="向左移動"
                         >
-                          <ArrowBackIcon />
+                          <ArrowLeft />
                         </IconButton>
                         <IconButton
                           size="small"
@@ -653,7 +847,7 @@ export default function EditPage() {
                           disabled={index === images.length - 1}
                           aria-label="向右移動"
                         >
-                          <ArrowForwardIcon />
+                          <ArrowRight />
                         </IconButton>
                       </Stack>
                       <IconButton
@@ -662,7 +856,7 @@ export default function EditPage() {
                         onClick={() => image.id && handleDeleteImage(image.id)}
                         aria-label="刪除"
                       >
-                        <DeleteIcon />
+                        <Trash2 />
                       </IconButton>
                     </CardActions>
                     </Card>
@@ -679,9 +873,13 @@ export default function EditPage() {
                 Instagram 貼文管理
               </Typography>
               <Button
-                variant="contained"
-                startIcon={<AddIcon />}
+                variant="outlined"
+                startIcon={<Plus />}
                 onClick={handleAddInstagramPost}
+                sx={{
+                  borderWidth: 2,
+                  '&:hover': { borderWidth: 2 },
+                }}
               >
                 新增貼文
               </Button>
@@ -736,7 +934,7 @@ export default function EditPage() {
                           disableRipple
                           disableFocusRipple
                         >
-                            <EditIcon />
+                            <Edit />
                           </IconButton>
                           <IconButton
                           size="small"
@@ -746,7 +944,7 @@ export default function EditPage() {
                           disableRipple
                           disableFocusRipple
                         >
-                            <DeleteIcon />
+                            <Trash2 />
                           </IconButton>
                         </Stack>
                       </Box>
@@ -775,6 +973,14 @@ export default function EditPage() {
         id="upload-image-new"
         type="file"
         onChange={handleFileSelect}
+      />
+      {/* 隱藏的文件輸入，用於新增活動日程表 */}
+      <input
+        accept="image/*"
+        style={{ display: 'none' }}
+        id="upload-schedule-image"
+        type="file"
+        onChange={handleScheduleFileSelect}
       />
 
       {/* 刪除輪播圖片確認對話框 */}
@@ -853,6 +1059,43 @@ export default function EditPage() {
         </DialogActions>
       </Dialog>
 
+      {/* 刪除活動日程表確認對話框 */}
+      <Dialog
+        open={deleteScheduleConfirmOpen}
+        onClose={() => {
+          setDeleteScheduleConfirmOpen(false);
+        }}
+        aria-labelledby="delete-schedule-confirm-dialog-title"
+        PaperProps={{
+          sx: {
+            minWidth: 300,
+            textAlign: 'center',
+            p: 3,
+          },
+        }}
+      >
+        <DialogTitle id="delete-schedule-confirm-dialog-title" sx={{ pb: 1 }}>
+          確定要刪除活動日程表嗎？
+        </DialogTitle>
+        <DialogActions sx={{ justifyContent: 'center', gap: 2, pt: 2 }}>
+          <Button
+            onClick={() => {
+              setDeleteScheduleConfirmOpen(false);
+            }}
+            variant="outlined"
+          >
+            取消
+          </Button>
+          <Button
+            onClick={handleConfirmDeleteSchedule}
+            variant="contained"
+            color="error"
+          >
+            確定刪除
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* 載入對話框 */}
       <Dialog
         open={uploading || deleting}
@@ -871,6 +1114,57 @@ export default function EditPage() {
         <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 0 }}>
           <CircularProgress />
         </DialogContent>
+      </Dialog>
+
+      {/* 預覽對話框 */}
+      <Dialog
+        open={!!previewImage}
+        onClose={() => setPreviewImage(null)}
+        maxWidth={false}
+        fullWidth
+        PaperProps={{
+          sx: {
+            maxWidth: '95vw',
+            width: '100%',
+            maxHeight: '90vh',
+            m: 2,
+          },
+        }}
+      >
+        {previewImage && (
+          <>
+            <DialogTitle>{previewImage.title}</DialogTitle>
+            <DialogContent 
+              dividers 
+              sx={{ 
+                px: 10,
+                py: 5,
+                maxHeight: 'calc(90vh - 120px)',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'flex-start',
+              }}
+            >
+              <Box
+                component="img"
+                src={previewImage.url}
+                alt={previewImage.title}
+                sx={{
+                  width: '100%',
+                  maxWidth: '100%',
+                  height: 'auto',
+                  display: 'block',
+                  objectFit: 'contain',
+                }}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setPreviewImage(null)}>關閉</Button>
+            </DialogActions>
+          </>
+        )}
       </Dialog>
 
       {/* Instagram 貼文編輯對話框 */}

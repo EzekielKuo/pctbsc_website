@@ -1,10 +1,10 @@
 import { MongoClient, Db } from 'mongodb';
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('請在環境變數中設定 MONGODB_URI');
+if (!process.env.DATABASE_URL) {
+  throw new Error('請在環境變數中設定 DATABASE_URL');
 }
 
-const uri = process.env.MONGODB_URI;
+const uri = process.env.DATABASE_URL;
 const options = {};
 
 let client: MongoClient;

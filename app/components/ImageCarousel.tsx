@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Box, Container, Typography } from '@mui/material';
-import ImageIcon from '@mui/icons-material/Image';
+import { Image as ImageIcon } from 'lucide-react';
 
 interface ImageCarouselProps {
   images: string[];
@@ -45,7 +45,7 @@ export default function ImageCarousel({
   // 沒有照片時顯示黑色背景
   if (images.length === 0) {
     return (
-      <Container maxWidth="lg" sx={{ pt: 1, pb: 4 }}>
+      <Container maxWidth="lg" sx={{ pt: 1, pb: 4, mt: 8 }}>
         <Box
           sx={{
             position: 'relative',
@@ -66,7 +66,7 @@ export default function ImageCarousel({
   };
 
   return (
-    <Container maxWidth="lg" sx={{ pt: 1, pb: 4 }}>
+    <Container maxWidth="lg" sx={{ pt: 1, pb: 4, mt: 8 }}>
       <Box sx={{ position: 'relative' }}>
         <Box
           className="carousel-container"
