@@ -1,9 +1,18 @@
 'use client';
 
+import { Suspense } from 'react';
 import usePageView from '../hooks/usePageView';
 
-export default function PageViewTracker() {
+function PageView() {
   usePageView();
   return null;
+}
+
+export default function PageViewTracker() {
+  return (
+    <Suspense fallback={null}>
+      <PageView />
+    </Suspense>
+  );
 }
 
