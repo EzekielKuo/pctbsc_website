@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Navigation from '@/app/components/Navigation';
 import Footer from '@/app/components/Footer';
@@ -46,6 +47,7 @@ export default function EditPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
   const [keyVisual, setKeyVisual] = useState<{ id?: string; url: string; publicId?: string | null } | null>(null);
+  const [keyVisualPage, setKeyVisualPage] = useState<'home' | 'bible'>('home');
   const [schedule, setSchedule] = useState<{ id?: string; url: string; publicId?: string | null } | null>(null);
   const [images, setImages] = useState<CarouselImage[]>([]);
   const [instagramPosts, setInstagramPosts] = useState<InstagramPost[]>([]);
@@ -66,6 +68,54 @@ export default function EditPage() {
   const [deleteKeyVisualConfirmOpen, setDeleteKeyVisualConfirmOpen] = useState(false);
   const [deleteScheduleConfirmOpen, setDeleteScheduleConfirmOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null);
+  const [bibleTopicName, setBibleTopicName] = useState('');
+  const [bibleTopicIntro, setBibleTopicIntro] = useState('');
+  const [bibleActivityInfo, setBibleActivityInfo] = useState('');
+  const [bibleSignupInfo, setBibleSignupInfo] = useState('');
+
+  // 處理 Dialog 打開/關閉時的滾動控制
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    if (previewImage) {
+      // Dialog 打開時：保持滾動條顯示，但禁用滾動功能
+      // 使用 overflow: hidden 會隱藏滾動條，所以改用 position: fixed 來阻止滾動
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      // 保存當前滾動位置
+      document.body.setAttribute('data-scroll-y', scrollY.toString());
+    } else {
+      // Dialog 關閉時：恢復滾動
+      const scrollY = document.body.getAttribute('data-scroll-y');
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.removeAttribute('data-scroll-y');
+      // 恢復滾動位置
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY));
+      }
+    }
+    
+    // 清理函數：確保組件卸載時恢復滾動
+    return () => {
+      const scrollY = document.body.getAttribute('data-scroll-y');
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.removeAttribute('data-scroll-y');
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY));
+      }
+    };
+  }, [previewImage]);
+  
+  // 處理 Dialog 關閉
+  const handleClosePreview = () => {
+    setPreviewImage(null);
+  };
 
   useEffect(() => {
     // 檢查登入狀態
@@ -631,9 +681,6 @@ export default function EditPage() {
       <Navigation currentPage="admin" />
       <Box component="main" sx={{ flexGrow: 1, py: 4 }}>
         <Container maxWidth="lg">
-          <Typography variant="h4" component="h1" sx={{ mb: 4, fontWeight: 700 }}>
-            編輯首頁輪播圖片
-          </Typography>
 
           {error && (
             <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
@@ -641,319 +688,492 @@ export default function EditPage() {
             </Alert>
           )}
 
+          <Stack direction="row" spacing={1.5} sx={{ mb: 3 }}>
+            <Button
+              variant={keyVisualPage === 'home' ? 'contained' : 'outlined'}
+              size="small"
+              onClick={() => setKeyVisualPage('home')}
+            >
+              主頁
+            </Button>
+            <Button
+              variant={keyVisualPage === 'bible' ? 'contained' : 'outlined'}
+              size="small"
+              onClick={() => setKeyVisualPage('bible')}
+            >
+              神研班頁面
+            </Button>
+          </Stack>
 
-          <Grid container spacing={2} sx={{ mb: 3 }}>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Paper sx={{ p: 3, height: '100%' }}>
+          {keyVisualPage === 'home' ? (
+            <>
+              <Paper sx={{ p: 3, mb: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                   <Typography variant="h6">
-                    主視覺圖片管理
+                    輪播圖片
                   </Typography>
-                  {keyVisual && (
-                    <IconButton
-                      color="error"
-                      onClick={handleDeleteKeyVisual}
-                      aria-label="刪除主視覺圖片"
-                    >
-                      <Trash2 />
-                    </IconButton>
-                  )}
-                </Box>
-                {keyVisual ? (
-                  <Box
-                    component="img"
-                    src={keyVisual.url}
-                    alt="主視覺"
-                    onClick={() => handleOpenPreview(keyVisual.url, '主視覺圖片')}
+                  <Button
+                    variant="text"
+                    startIcon={<Plus />}
+                    onClick={handleAddImage}
                     sx={{
-                      width: '100%',
-                      height: 260,
-                      objectFit: 'cover',
-                      borderRadius: 2,
-                      boxShadow: 2,
-                      cursor: 'pointer',
-                    }}
-                  />
-                ) : (
-                  <Box
-                    onClick={handleAddKeyVisual}
-                    sx={{
-                      width: '100%',
-                      minHeight: 200,
-                      backgroundColor: 'white',
-                      borderRadius: 2,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      border: '2px dashed rgba(0, 0, 0, 0.3)',
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                        borderColor: 'rgba(0, 0, 0, 0.5)',
-                      },
+                      textTransform: 'none',
                     }}
                   >
-                    <Box sx={{ mb: 2, color: 'rgba(0, 0, 0, 0.5)' }}>
-                      <Upload size={48} />
-                    </Box>
-                    <Typography variant="body1" sx={{ color: 'rgba(0, 0, 0, 0.7)' }}>
-                      點擊上傳主視覺圖片
-                    </Typography>
-                  </Box>
+                    新增圖片
+                  </Button>
+                </Box>
+
+                {images.length === 0 ? (
+                  <Typography variant="body1" color="text.secondary" align="center" sx={{ py: 4 }}>
+                    目前尚無圖片，點擊「新增圖片」開始添加
+                  </Typography>
+                ) : (
+                  <Grid container spacing={2}>
+                    {images.map((image, index) => (
+                      <Grid size={{ xs: 12, sm: 6, md: 4 }} key={image.id || index}>
+                        <Card
+                          sx={{
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                          }}
+                        >
+                          <Box sx={{ position: 'relative' }}>
+                            <CardMedia
+                              component="img"
+                              image={image.url}
+                              alt={`照片 ${index + 1}`}
+                              sx={{
+                                aspectRatio: '16/9',
+                                objectFit: 'cover',
+                              }}
+                            />
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                top: 8,
+                                left: 8,
+                                bgcolor: 'rgba(0, 0, 0, 0.6)',
+                                color: 'white',
+                                px: 1.5,
+                                py: 0.5,
+                                borderRadius: 1,
+                                fontSize: '0.875rem',
+                                fontWeight: 600,
+                              }}
+                            >
+                              照片 {index + 1}
+                            </Box>
+                          </Box>
+                          <CardActions sx={{ justifyContent: 'space-between', px: 2, py: 1.5 }}>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                              <IconButton
+                                size="small"
+                                onClick={() => handleMoveLeft(index)}
+                                disabled={index === 0}
+                                aria-label="向左移動"
+                              >
+                                <ArrowLeft />
+                              </IconButton>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleMoveRight(index)}
+                                disabled={index === images.length - 1}
+                                aria-label="向右移動"
+                              >
+                                <ArrowRight />
+                              </IconButton>
+                            </Stack>
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => image.id && handleDeleteImage(image.id)}
+                              aria-label="刪除"
+                            >
+                              <Trash2 />
+                            </IconButton>
+                          </CardActions>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
                 )}
               </Paper>
-            </Grid>
 
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Paper sx={{ p: 3, height: '100%' }}>
+              {/* Instagram 貼文管理 */}
+              <Paper sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                   <Typography variant="h6">
-                    活動日程表管理
+                    Instagram 貼文管理
                   </Typography>
-                  {schedule && (
-                    <IconButton
-                      color="error"
-                      onClick={handleDeleteSchedule}
-                      aria-label="刪除活動日程表"
-                    >
-                      <Trash2 />
-                    </IconButton>
-                  )}
-                </Box>
-                {schedule ? (
-                  <Box
-                    component="img"
-                    src={schedule.url}
-                    alt="活動日程表"
-                    onClick={() => handleOpenPreview(schedule.url, '活動日程表')}
+                  <Button
+                    variant="outlined"
+                    startIcon={<Plus />}
+                    onClick={handleAddInstagramPost}
                     sx={{
-                      width: '95%',
-                      height: 260,
-                      objectFit: 'cover',
-                      borderRadius: 2,
-                      boxShadow: 2,
-                      cursor: 'pointer',
-                      mx: 'auto',
-                    }}
-                  />
-                ) : (
-                  <Box
-                    onClick={handleAddSchedule}
-                    sx={{
-                      width: '100%',
-                      minHeight: 200,
-                      backgroundColor: 'white',
-                      borderRadius: 2,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      border: '2px dashed rgba(0, 0, 0, 0.3)',
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                        borderColor: 'rgba(0, 0, 0, 0.5)',
-                      },
+                      borderWidth: 2,
+                      '&:hover': { borderWidth: 2 },
                     }}
                   >
-                    <Box sx={{ mb: 2, color: 'rgba(0, 0, 0, 0.5)' }}>
-                      <Upload size={48} />
-                    </Box>
-                    <Typography variant="body1" sx={{ color: 'rgba(0, 0, 0, 0.7)' }}>
-                      點擊上傳活動日程表
-                    </Typography>
-                  </Box>
+                    新增貼文
+                  </Button>
+                </Box>
+
+                {instagramPosts.length === 0 ? (
+                  <Typography variant="body1" color="text.secondary" align="center" sx={{ py: 4 }}>
+                    目前尚無 Instagram 貼文，點擊「新增貼文」開始添加
+                  </Typography>
+                ) : (
+                  <Grid container spacing={2}>
+                    {instagramPosts.map((post, index) => (
+                      <Grid size={{ xs: 12, sm: 3, md: 3 }} key={post.id || index}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            pl: 3,
+                            pr: 0.5,
+                            py: 2,
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            borderRadius: 1,
+                            bgcolor: 'background.paper',
+                            minHeight: 60,
+                            width: '100%',
+                            '&:hover': {
+                              bgcolor: 'action.hover',
+                            },
+                          }}
+                        >
+                          <Typography 
+                            variant="body1" 
+                            sx={{ 
+                              flex: '1 1 auto',
+                              minWidth: 0,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              mr: 1,
+                            }}
+                          >
+                            {post.name || `貼文 ${index + 1}`}
+                          </Typography>
+                          <Box sx={{ flexShrink: 0 }}>
+                            <Stack direction="row" spacing={0.5}>
+                              <IconButton
+                                size="small"
+                                color="primary"
+                                onClick={() => handleEditInstagramPost(post)}
+                                aria-label="編輯"
+                                disableRipple
+                                disableFocusRipple
+                              >
+                                <Edit />
+                              </IconButton>
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={() => post.id && handleDeleteInstagramPost(post.id)}
+                                aria-label="刪除"
+                                disableRipple
+                                disableFocusRipple
+                              >
+                                <Trash2 />
+                              </IconButton>
+                            </Stack>
+                          </Box>
+                        </Box>
+                      </Grid>
+                    ))}
+                  </Grid>
                 )}
               </Paper>
-            </Grid>
-          </Grid>
-
-          <Paper sx={{ p: 3, mb: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <Typography variant="h6">
-                輪播圖片管理
-              </Typography>
-              <Button
-                variant="outlined"
-                startIcon={<Plus />}
-                onClick={handleAddImage}
-                sx={{
-                  borderWidth: 2,
-                  '&:hover': { borderWidth: 2 },
-                }}
-              >
-                新增圖片
-              </Button>
-            </Box>
-
-            {images.length === 0 ? (
-              <Typography variant="body1" color="text.secondary" align="center" sx={{ py: 4 }}>
-                目前尚無圖片，點擊「新增圖片」開始添加
-              </Typography>
-            ) : (
-              <Grid container spacing={2}>
-                {images.map((image, index) => (
-                  <Grid size={{ xs: 12, sm: 6, md: 4 }} key={image.id || index}>
-                    <Card
-                      sx={{
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                      }}
-                    >
-                    <Box sx={{ position: 'relative' }}>
-                      <CardMedia
+            </>
+          ) : (
+            <>
+              <Grid container columnSpacing={2} rowSpacing={5} sx={{ mb: 4 }}>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <Paper sx={{ p: 3, height: '100%' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                      <Typography variant="h6">
+                        主視覺圖片
+                      </Typography>
+                      {keyVisual && (
+                        <IconButton
+                          color="error"
+                          onClick={handleDeleteKeyVisual}
+                          aria-label="刪除主視覺圖片"
+                        >
+                          <Trash2 />
+                        </IconButton>
+                      )}
+                    </Box>
+                    {keyVisual ? (
+                      <Box
                         component="img"
-                        image={image.url}
-                        alt={`照片 ${index + 1}`}
+                        src={keyVisual.url}
+                        alt="主視覺"
+                        onClick={() => handleOpenPreview(keyVisual.url, '主視覺圖片')}
                         sx={{
-                          aspectRatio: '16/9',
+                          width: '100%',
+                          height: 260,
                           objectFit: 'cover',
+                          borderRadius: 2,
+                          boxShadow: 2,
+                          cursor: 'pointer',
                         }}
                       />
+                    ) : (
                       <Box
+                        onClick={handleAddKeyVisual}
                         sx={{
-                          position: 'absolute',
-                          top: 8,
-                          left: 8,
-                          bgcolor: 'rgba(0, 0, 0, 0.6)',
-                          color: 'white',
-                          px: 1.5,
-                          py: 0.5,
-                          borderRadius: 1,
-                          fontSize: '0.875rem',
-                          fontWeight: 600,
+                          width: '100%',
+                          minHeight: 200,
+                          backgroundColor: 'white',
+                          borderRadius: 2,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          border: '2px dashed rgba(0, 0, 0, 0.3)',
+                          transition: 'all 0.3s ease',
+                          '&:hover': {
+                            backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                            borderColor: 'rgba(0, 0, 0, 0.5)',
+                          },
                         }}
                       >
-                        照片 {index + 1}
+                        <Box sx={{ mb: 2, color: 'rgba(0, 0, 0, 0.5)' }}>
+                          <Upload size={48} />
+                        </Box>
+                        <Typography variant="body1" sx={{ color: 'rgba(0, 0, 0, 0.7)' }}>
+                          點擊上傳主視覺圖片
+                        </Typography>
                       </Box>
-                    </Box>
-                    <CardActions sx={{ justifyContent: 'space-between', px: 2, py: 1.5 }}>
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleMoveLeft(index)}
-                          disabled={index === 0}
-                          aria-label="向左移動"
-                        >
-                          <ArrowLeft />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleMoveRight(index)}
-                          disabled={index === images.length - 1}
-                          aria-label="向右移動"
-                        >
-                          <ArrowRight />
-                        </IconButton>
-                      </Stack>
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => image.id && handleDeleteImage(image.id)}
-                        aria-label="刪除"
-                      >
-                        <Trash2 />
-                      </IconButton>
-                    </CardActions>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            )}
-          </Paper>
+                    )}
+                  </Paper>
+                </Grid>
 
-          {/* Instagram 貼文管理 */}
-          <Paper sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <Typography variant="h6">
-                Instagram 貼文管理
-              </Typography>
-              <Button
-                variant="outlined"
-                startIcon={<Plus />}
-                onClick={handleAddInstagramPost}
-                sx={{
-                  borderWidth: 2,
-                  '&:hover': { borderWidth: 2 },
-                }}
-              >
-                新增貼文
-              </Button>
-            </Box>
-
-            {instagramPosts.length === 0 ? (
-              <Typography variant="body1" color="text.secondary" align="center" sx={{ py: 4 }}>
-                目前尚無 Instagram 貼文，點擊「新增貼文」開始添加
-              </Typography>
-            ) : (
-              <Grid container spacing={2}>
-                {instagramPosts.map((post, index) => (
-                  <Grid size={{ xs: 12, sm: 6, md: 3 }} key={post.id || index}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        pl: 3,
-                        pr: 0.5,
-                        py: 2,
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        borderRadius: 1,
-                        bgcolor: 'background.paper',
-                        minHeight: 60,
-                        width: '100%',
-                        '&:hover': {
-                          bgcolor: 'action.hover',
-                        },
-                      }}
-                    >
-                      <Typography 
-                        variant="body1" 
-                        sx={{ 
-                          flex: '1 1 auto',
-                          minWidth: 0,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          mr: 1,
-                        }}
-                      >
-                        {post.name || `貼文 ${index + 1}`}
+                <Grid size={{ xs: 12, md: 6 }} sx={{ mt: { xs: 6, md: 7 } }}>
+                  <Paper sx={{ p: 3, height: '100%' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                      <Typography variant="h6">
+                        活動日程表
                       </Typography>
-                      <Box sx={{ flexShrink: 0 }}>
-                        <Stack direction="row" spacing={0.5}>
+                      {schedule && (
                         <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={() => handleEditInstagramPost(post)}
-                          aria-label="編輯"
-                          disableRipple
-                          disableFocusRipple
-                        >
-                            <Edit />
-                          </IconButton>
-                          <IconButton
-                          size="small"
                           color="error"
-                          onClick={() => post.id && handleDeleteInstagramPost(post.id)}
-                          aria-label="刪除"
-                          disableRipple
-                          disableFocusRipple
+                          onClick={handleDeleteSchedule}
+                          aria-label="刪除活動日程表"
                         >
-                            <Trash2 />
-                          </IconButton>
-                        </Stack>
-                      </Box>
+                          <Trash2 />
+                        </IconButton>
+                      )}
                     </Box>
-                  </Grid>
-                ))}
+                    {schedule ? (
+                      <Box
+                        component="img"
+                        src={schedule.url}
+                        alt="活動日程表"
+                        onClick={() => handleOpenPreview(schedule.url, '活動日程表')}
+                        sx={{
+                          width: '95%',
+                          height: 260,
+                          objectFit: 'cover',
+                          borderRadius: 2,
+                          boxShadow: 2,
+                          cursor: 'pointer',
+                          mx: 'auto',
+                        }}
+                      />
+                    ) : (
+                      <Box
+                        onClick={handleAddSchedule}
+                        sx={{
+                          width: '100%',
+                          minHeight: 200,
+                          backgroundColor: 'white',
+                          borderRadius: 2,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          border: '2px dashed rgba(0, 0, 0, 0.3)',
+                          transition: 'all 0.3s ease',
+                          '&:hover': {
+                            backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                            borderColor: 'rgba(0, 0, 0, 0.5)',
+                          },
+                        }}
+                      >
+                        <Box sx={{ mb: 2, color: 'rgba(0, 0, 0, 0.5)' }}>
+                          <Upload size={48} />
+                        </Box>
+                        <Typography variant="body1" sx={{ color: 'rgba(0, 0, 0, 0.7)' }}>
+                          點擊上傳活動日程表
+                        </Typography>
+                      </Box>
+                    )}
+                  </Paper>
+                </Grid>
               </Grid>
-            )}
-          </Paper>
+
+              <Stack spacing={3}>
+                <Paper sx={{ p: 3 }}>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    主題名稱
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    placeholder="請輸入主題名稱"
+                    value={bibleTopicName}
+                    onChange={(e) => setBibleTopicName(e.target.value)}
+                  />
+                </Paper>
+
+                <Paper sx={{ p: 3 }}>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    主題介紹
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    multiline
+                    minRows={3}
+                    placeholder="請輸入主題介紹"
+                    value={bibleTopicIntro}
+                    onChange={(e) => setBibleTopicIntro(e.target.value)}
+                  />
+                </Paper>
+
+                <Paper sx={{ p: 3 }}>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    活動資訊
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    multiline
+                    minRows={3}
+                    placeholder="請輸入活動資訊"
+                    value={bibleActivityInfo}
+                    onChange={(e) => setBibleActivityInfo(e.target.value)}
+                  />
+                </Paper>
+
+                <Paper sx={{ p: 3 }}>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    報名資訊
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    multiline
+                    minRows={3}
+                    placeholder="請輸入報名資訊"
+                    value={bibleSignupInfo}
+                    onChange={(e) => setBibleSignupInfo(e.target.value)}
+                  />
+                </Paper>
+
+                <Paper sx={{ p: 3 }}>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    神研班主題
+                  </Typography>
+                  <Box
+                    sx={{
+                      minHeight: 120,
+                      border: '2px dashed rgba(0,0,0,0.2)',
+                      borderRadius: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'rgba(0,0,0,0.65)',
+                      bgcolor: 'background.paper',
+                      px: 2,
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Typography variant="body1">
+                      {bibleTopicName || '尚未輸入主題名稱'}
+                    </Typography>
+                  </Box>
+                </Paper>
+
+                <Paper sx={{ p: 3 }}>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    主題介紹
+                  </Typography>
+                  <Box
+                    sx={{
+                      minHeight: 120,
+                      border: '2px dashed rgba(0,0,0,0.2)',
+                      borderRadius: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'rgba(0,0,0,0.65)',
+                      bgcolor: 'background.paper',
+                      px: 2,
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Typography variant="body1">
+                      {bibleTopicIntro || '尚未輸入主題介紹'}
+                    </Typography>
+                  </Box>
+                </Paper>
+
+                <Paper sx={{ p: 3 }}>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    活動資訊
+                  </Typography>
+                  <Box
+                    sx={{
+                      minHeight: 120,
+                      border: '2px dashed rgba(0,0,0,0.2)',
+                      borderRadius: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'rgba(0,0,0,0.65)',
+                      bgcolor: 'background.paper',
+                      px: 2,
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Typography variant="body1">
+                      {bibleActivityInfo || '尚未輸入活動資訊'}
+                    </Typography>
+                  </Box>
+                </Paper>
+
+                <Paper sx={{ p: 3 }}>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    報名資訊
+                  </Typography>
+                  <Box
+                    sx={{
+                      minHeight: 120,
+                      border: '2px dashed rgba(0,0,0,0.2)',
+                      borderRadius: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'rgba(0,0,0,0.65)',
+                      bgcolor: 'background.paper',
+                      px: 2,
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Typography variant="body1">
+                      {bibleSignupInfo || '尚未輸入報名資訊'}
+                    </Typography>
+                  </Box>
+                </Paper>
+              </Stack>
+            </>
+          )}
         </Container>
       </Box>
       <Footer contactInfo={contactInfo} links={links} />
@@ -1119,15 +1339,25 @@ export default function EditPage() {
       {/* 預覽對話框 */}
       <Dialog
         open={!!previewImage}
-        onClose={() => setPreviewImage(null)}
+        onClose={handleClosePreview}
         maxWidth={false}
         fullWidth
+        disableScrollLock={true} // 禁用 MUI 的 scroll lock，我們手動處理滾動
         PaperProps={{
           sx: {
             maxWidth: '95vw',
             width: '100%',
             maxHeight: '90vh',
             m: 2,
+            // 移除 Paper 的邊框和輪廓
+            border: 'none',
+            outline: 'none',
+          },
+        }}
+        sx={{
+          // 移除 Dialog 容器右側可能的黑色線條
+          '& .MuiDialog-container': {
+            // 不設置 border，只移除可能的背景色問題
           },
         }}
       >
@@ -1135,30 +1365,79 @@ export default function EditPage() {
           <>
             <DialogTitle>{previewImage.title}</DialogTitle>
             <DialogContent 
-              dividers 
               sx={{ 
-                px: 10,
+                px: 0, // 移除左右 padding，讓滾動條緊貼右邊
                 py: 5,
                 maxHeight: 'calc(90vh - 120px)',
-                overflowY: 'auto',
+                overflowY: 'auto', // 只在需要時顯示滾動條
                 overflowX: 'hidden',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
+                position: 'relative',
+                // 移除 dividers 的邊框
+                borderTop: 'none',
+                borderBottom: 'none',
+                borderRight: 'none', // 移除右側邊框
+                borderLeft: 'none', // 移除左側邊框
+                // Firefox 滾動條樣式 - 只在需要時顯示
+                scrollbarWidth: 'auto',
+                scrollbarColor: 'rgba(0, 0, 0, 0.3) transparent',
+                // 不使用 scrollbar-gutter，讓滾動條覆蓋在內容上
+                // WebKit 滾動條樣式 - 深色滾動條，固定在右邊，覆蓋在內容上
+                '&::-webkit-scrollbar': {
+                  width: '16px',
+                  backgroundColor: 'transparent', // 透明背景
+                },
+                '&::-webkit-scrollbar-track': {
+                  backgroundColor: 'transparent', // 透明軌道
+                  borderRadius: '8px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                  borderRadius: '8px',
+                  border: 'none',
+                },
+                '&::-webkit-scrollbar-thumb:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                },
+                // 完全移除滾動條的所有按鈕和邊角
+                '&::-webkit-scrollbar-button': {
+                  display: 'none',
+                  width: 0,
+                  height: 0,
+                },
+                '&::-webkit-scrollbar-corner': {
+                  display: 'none',
+                },
+              }}
+              style={{
+                direction: 'ltr', // 確保滾動條在右邊
               }}
             >
               <Box
-                component="img"
-                src={previewImage.url}
-                alt={previewImage.title}
                 sx={{
                   width: '100%',
-                  maxWidth: '100%',
-                  height: 'auto',
-                  display: 'block',
-                  objectFit: 'contain',
+                  px: 10, // 圖片內容的左右 padding
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  // 確保內容寬度不受滾動條影響
+                  boxSizing: 'border-box',
                 }}
-              />
+              >
+                <Box
+                  component="img"
+                  src={previewImage.url}
+                  alt={previewImage.title}
+                  sx={{
+                    width: '100%',
+                    maxWidth: '100%',
+                    height: 'auto',
+                    display: 'block',
+                    objectFit: 'contain',
+                    // 確保圖片寬度不受滾動條影響
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </Box>
             </DialogContent>
             <DialogActions>
               <Button onClick={() => setPreviewImage(null)}>關閉</Button>

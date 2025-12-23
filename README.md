@@ -43,7 +43,7 @@ pctbsc_website/
 │   │   ├── instagram/       # Instagram 貼文 API
 │   │   ├── upload/          # 圖片上傳 API
 │   │   └── gallery/         # 圖片庫 API
-│   ├── 63bsc/               # 第 63 屆神研班相關頁面
+│   ├── bsc/                 # 神研班相關頁面
 │   │   ├── theme/           # 神研班主題頁面
 │   │   ├── schedule/         # 活動日程表頁面
 │   │   └── info/             # 活動資訊與報名頁面
@@ -66,47 +66,63 @@ pctbsc_website/
 └── package.json            # 專案依賴
 ```
 
-## 開始使用
+## 在 localhost 安裝與測試步驟
 
-### 前置需求
-
-- Node.js 18+ 
+### 1. 前置需求
+- Node.js 18 以上
 - Yarn 或 npm
-- MongoDB 資料庫（用於儲存留言、圖片等資料）
+- MongoDB（本機或雲端皆可）。若要本機快速啟動，可用 Docker：
+  ```bash
+  docker run -d --name pctbsc-mongo -p 27017:27017 mongo:7
+  ```
 
-### 環境變數設定
-
-在專案根目錄創建 `.env` 檔案（可參考 `.env.example`），並設定變數。
-
-### 安裝依賴
-
+### 2. 取得與安裝專案
 ```bash
-yarn install
+git clone <repository-url> pctbsc_website
+cd pctbsc_website
+yarn install  # 或 npm install
+```
 
-# Prisma
+### 3. 設定環境變數
+在專案根目錄建立 `.env.local`，至少需設定下列鍵值（MongoDB URL 必填）：
+```bash
+DATABASE_URL="mongodb://localhost:27017/pctbsc"
+AUTH_SECRET="local-dev-secret"              # NextAuth 必填
+GOOGLE_CLIENT_ID=""                         # 若要啟用 Google 登入
+GOOGLE_CLIENT_SECRET=""
+GITHUB_CLIENT_ID=""                         # 若要啟用 GitHub 登入
+GITHUB_CLIENT_SECRET=""
+CLOUDINARY_CLOUD_NAME=""                    # 若要啟用圖片上傳
+CLOUDINARY_API_KEY=""
+CLOUDINARY_API_SECRET=""
+INSTAGRAM_OEMBED_ACCESS_TOKEN=""            # 選填，用於自動取得貼文描述
+NEXT_PUBLIC_GA_MEASUREMENT_ID=""            # 選填，若需 GA
+NEXTAUTH_URL="http://localhost:3000"        # 建議於本機加上
+```
+- 未填 Cloudinary/Instagram 相關變數時，圖片上傳與自動抓取 Instagram 描述會失效，但其餘頁面仍可瀏覽。
+- 啟用 OAuth 時，請在 Google/GitHub 後台將回呼網址設為 `http://localhost:3000/api/auth/callback/<provider>`。
+
+### 4. 初始化資料庫
+```bash
 npx prisma generate
 npx prisma db push
 ```
+（會在 `DATABASE_URL` 指向的 MongoDB 建立所需資料表結構）
 
-### 開發模式
-
+### 5. 啟動開發伺服器
 ```bash
-yarn dev
+yarn dev   # 或 npm run dev
 ```
+打開 [http://localhost:3000](http://localhost:3000) 進行測試。
 
-開啟瀏覽器訪問 [http://localhost:3000](http://localhost:3000) 查看網站。
+### 6. 本機登入／測試方式
+- **快速測試（無 OAuth）**：在登入頁 `/login` 直接按登入（空白帳密）會以 guest 登入；輸入 `admin` / `admin` 會在本機取得管理員權限，可進入 `/edit`。
+- **正式 OAuth**：設定 Google/GitHub 環境變數後，可使用「Sign in with Google/GitHub」登入，登入後需在頁面上設定自訂使用者 ID 才會完成狀態。
 
-### 建置生產版本
-
-```bash
-yarn build
-```
-
-### 啟動生產伺服器
-
-```bash
-yarn start
-```
+### 7. 其他常用指令
+- 建置生產版：`yarn build`
+- 啟動生產伺服器：`yarn start`
+- 程式碼檢查：`yarn lint`
 
 ## 開發說明
 
@@ -115,9 +131,9 @@ yarn start
 - `/` - 首頁（主視覺、輪播圖片、宣傳組資訊、倒數計時、留言板）
 - `/about` - 營會介紹
 - `/about/timeline` - 重要時程
-- `/63bsc/theme` - 第 63 屆神研班主題「赦免誰的罪過」
-- `/63bsc/info` - 活動資訊與報名資訊
-- `/63bsc/schedule` - 活動日程表
+- `/bsc/theme` - 神研班主題「赦免誰的罪過」
+- `/bsc/info` - 活動資訊與報名資訊
+- `/bsc/schedule` - 活動日程表
 - `/interview` - 神研前輩訪談（緣起）
 - `/interview/chen-nan-zhou` - 第1-7屆｜陳南州牧師
 - `/interview/huang-chun-sheng` - 第20屆後｜黃春生牧師

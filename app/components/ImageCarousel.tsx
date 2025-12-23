@@ -58,7 +58,7 @@ export default function ImageCarousel({
   // 沒有照片時顯示黑色背景
   if (images.length === 0) {
     return (
-      <Container maxWidth="lg" sx={{ pt: 1, pb: 4, mt: 8 }}>
+      <Container maxWidth={false} disableGutters sx={{ pt: 0, pb: 4, mt: 0 }}>
         <Box
           sx={{
             position: 'relative',
@@ -87,7 +87,7 @@ export default function ImageCarousel({
   };
 
   return (
-    <Container maxWidth="lg" sx={{ pt: 1, pb: 4, mt: 8 }}>
+    <Container maxWidth={false} disableGutters sx={{ pt: 0, pb: 4, mt: 0 }}>
       <Box sx={{ position: 'relative' }}>
         <Box
           className="carousel-container"
@@ -118,7 +118,7 @@ export default function ImageCarousel({
                   height: '100%',
                   flexShrink: 0,
                   display: 'flex',
-                  alignItems: 'center',
+                  alignItems: 'flex-start',
                   justifyContent: 'center',
                   position: 'relative',
                 }}

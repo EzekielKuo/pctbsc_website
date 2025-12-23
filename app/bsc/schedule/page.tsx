@@ -58,22 +58,34 @@ export default function SchedulePage() {
               justifyContent: 'center',
               alignItems: 'center',
               minHeight: 400,
+              overflow: 'visible',
             }}
           >
             {loading ? (
               <CircularProgress />
             ) : scheduleUrl ? (
               <Box
-                component="img"
-                src={scheduleUrl}
-                alt="活動日程表"
                 sx={{
                   width: '100%',
-                  height: 'auto',
-                  display: 'block',
-                  borderRadius: 1,
+                  position: 'relative',
+                  overflow: 'visible', // 讓日程表完整呈現，不內嵌捲動
                 }}
-              />
+                style={{
+                  direction: 'ltr', // 確保滾動條在右邊
+                }}
+              >
+                <Box
+                  component="img"
+                  src={scheduleUrl}
+                  alt="活動日程表"
+                  sx={{
+                    width: '100%',
+                    height: 'auto',
+                    display: 'block',
+                    borderRadius: 1,
+                  }}
+                />
+              </Box>
             ) : (
               <Box sx={{ width: '100%', minHeight: 200 }} />
             )}

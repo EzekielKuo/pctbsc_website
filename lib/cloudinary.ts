@@ -28,7 +28,9 @@ export async function uploadImageToCloudinary(
         { quality: 'auto' },
         { fetch_format: 'auto' },
       ],
-      timeout: 60000, // 60 秒超時
+      timeout: 120000, // 120 秒超時（增加 timeout 時間）
+      chunk_size: 6000000, // 6MB 分塊上傳，加快大檔案上傳速度
+      eager_async: false, // 同步處理，避免額外等待
     });
 
     return {
