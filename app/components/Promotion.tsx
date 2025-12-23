@@ -283,7 +283,7 @@ export default function Promotion({ title = '宣傳組資訊' }: PromotionProps)
                     key={post.id}
                     data-post
                     sx={{
-                      flex: '0 0 25%',
+                      flex: '0 0 17%',
                       position: 'relative',
                     }}
                   >
@@ -307,7 +307,7 @@ export default function Promotion({ title = '宣傳組資訊' }: PromotionProps)
                         src={getInstagramEmbedUrl(post.url)}
                         title={`Instagram 貼文 ${post.id}`}
                         width="100%"
-                        height="600"
+                        height="440"
                         frameBorder="0"
                         scrolling="no"
                         {...{

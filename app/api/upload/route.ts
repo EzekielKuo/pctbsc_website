@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { uploadImageToCloudinary } from '@/lib/cloudinary';
 
 // 設定路由配置以增加超時時間
-export const maxDuration = 60; // 60 秒（Vercel Pro 計劃支援，免費計劃為 10 秒）
+export const maxDuration = 120; // 120 秒（增加 timeout 時間，Vercel Pro 計劃支援，免費計劃為 10 秒）
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {

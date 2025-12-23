@@ -60,29 +60,6 @@ export default function InterviewPage() {
           </Typography>
         </Paper>
 
-        <Paper sx={{ p: 4 }}>
-          <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
-            訪談對象
-          </Typography>
-          <Divider sx={{ mb: 3 }} />
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Link href="/interview/chen-nan-zhou" style={{ textDecoration: 'none' }}>
-              <MuiLink component="div" sx={{ cursor: 'pointer', fontSize: '1.1rem' }}>
-                第1-7屆｜陳南州牧師
-              </MuiLink>
-            </Link>
-            <Link href="/interview/huang-chun-sheng" style={{ textDecoration: 'none' }}>
-              <MuiLink component="div" sx={{ cursor: 'pointer', fontSize: '1.1rem' }}>
-                第20屆後｜黃春生牧師
-              </MuiLink>
-            </Link>
-            <Link href="/interview/huang-hsu-hui" style={{ textDecoration: 'none' }}>
-              <MuiLink component="div" sx={{ cursor: 'pointer', fontSize: '1.1rem' }}>
-                第50屆後｜黃敍慧姊妹
-              </MuiLink>
-            </Link>
-          </Box>
-        </Paper>
       </Container>
       <Footer contactInfo={contactInfo} links={links} />
     </Box>
