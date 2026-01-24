@@ -46,8 +46,9 @@ function Button({
     // 處理 variant 特定的樣式
     if (variant === "destructive") {
       baseSx.bgcolor = "error.main"
+      const hoverStyle = baseSx["&:hover"] as Record<string, unknown> | undefined;
       baseSx["&:hover"] = {
-        ...baseSx["&:hover"],
+        ...(hoverStyle || {}),
         bgcolor: "error.dark",
       }
     }
@@ -79,12 +80,12 @@ function Button({
   }, [variant, size, sx])
 
   if (asChild && React.isValidElement(props.children)) {
-    return React.cloneElement(props.children as React.ReactElement, {
+    return React.cloneElement(props.children as React.ReactElement<MuiButtonProps>, {
       ...props,
       variant: muiVariant,
       size: muiSize,
       sx: buttonSx,
-    })
+    } as MuiButtonProps)
   }
 
   return (

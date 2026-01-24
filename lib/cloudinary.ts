@@ -141,9 +141,9 @@ export function transformCloudinaryResource(resource: CloudinaryResource): {
   return {
     publicId: resource.public_id,
     url: resource.secure_url,
-    title: context.caption || context.title || resource.filename || resource.public_id.split('/').pop(),
+    title: context.caption || context.title || resource.filename || resource.public_id.split('/').pop() || '',
     description: context.description || context.alt || undefined,
-    category: context.category || category,
+    category: (context.category as '活動花絮' | '歷史常設展' | '宣傳組資訊' | '其他') || category,
     year: context.year ? parseInt(context.year) : undefined,
     date: context.date || undefined,
     width: resource.width,

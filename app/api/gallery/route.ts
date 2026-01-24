@@ -13,9 +13,9 @@ export async function GET(request: NextRequest) {
     const collection = db.collection<GalleryImage>('gallery');
 
     // 建立查詢條件
-    const query: { category?: string; year?: number } = {};
+    const query: { category?: '活動花絮' | '歷史常設展' | '宣傳組資訊' | '其他'; year?: number } = {};
     if (category) {
-      query.category = category;
+      query.category = category as '活動花絮' | '歷史常設展' | '宣傳組資訊' | '其他';
     }
     if (year) {
       query.year = parseInt(year);

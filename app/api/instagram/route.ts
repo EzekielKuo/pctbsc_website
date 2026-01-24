@@ -144,7 +144,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const updateData: { url?: string; description?: string | null } = {};
+    const updateData: { url?: string; description?: string | null; name?: string | null; order?: number } = {};
     if (url) {
       // 驗證 Instagram URL 格式
       if (!url.includes('instagram.com/p/') && !url.includes('instagram.com/reel/')) {
