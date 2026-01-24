@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(request: NextRequest) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function GET(_: NextRequest) {
   try {
     const schedule = await prisma.scheduleImage.findFirst({
       orderBy: { updatedAt: 'desc' },
@@ -82,9 +83,10 @@ export async function DELETE(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('刪除活動日程表錯誤:', error);
-    if (error.code === 'P2025') {
+    const err = error as { code?: string };
+    if (err.code === 'P2025') {
       return NextResponse.json(
         { success: false, error: '活動日程表不存在' },
         { status: 404 }

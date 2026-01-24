@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Box, Container, Typography } from '@mui/material';
-import { Image as ImageIcon } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Box, Container } from '@mui/material';
 import { event } from '@/lib/gtag';
 
 interface ImageCarouselProps {
@@ -20,7 +19,7 @@ export default function ImageCarousel({
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // 重置計時器的函數
-  const resetTimer = (isAuto: boolean = true) => {
+  const resetTimer = useCallback((isAuto: boolean = true) => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
@@ -41,7 +40,7 @@ export default function ImageCarousel({
         });
       }, interval);
     }
-  };
+  }, [images.length, interval]);
 
   useEffect(() => {
     if (images.length === 0) return;
@@ -53,7 +52,7 @@ export default function ImageCarousel({
         clearInterval(timerRef.current);
       }
     };
-  }, [images.length, interval]);
+  }, [images.length, interval, resetTimer]);
 
   // 沒有照片時顯示黑色背景
   if (images.length === 0) {

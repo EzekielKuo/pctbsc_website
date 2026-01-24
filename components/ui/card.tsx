@@ -1,81 +1,114 @@
 import * as React from "react"
+import {
+  Card as MuiCard,
+  CardContent as MuiCardContent,
+  CardHeader as MuiCardHeader,
+  Typography,
+  Box,
+  CardProps,
+  CardContentProps,
+  CardHeaderProps,
+} from "@mui/material"
 
-import { cn } from "@/lib/utils"
-
-function Card({ className, ...props }: React.ComponentProps<"div">) {
+function Card({ sx, ...props }: CardProps) {
   return (
-    <div
-      data-slot="card"
-      className={cn(
-        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm",
-        className
-      )}
+    <MuiCard
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 3,
+        borderRadius: 2,
+        py: 3,
+        ...sx,
+      }}
       {...props}
     />
   )
 }
 
-function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
+function CardHeader({ sx, ...props }: CardHeaderProps) {
   return (
-    <div
-      data-slot="card-header"
-      className={cn(
-        "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6",
-        className
-      )}
+    <MuiCardHeader
+      sx={{
+        display: "grid",
+        gridTemplateRows: "auto auto",
+        alignItems: "start",
+        gap: 1,
+        px: 3,
+        ...sx,
+      }}
       {...props}
     />
   )
 }
 
-function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
+function CardTitle({ sx, ...props }: React.ComponentProps<typeof Typography>) {
   return (
-    <div
-      data-slot="card-title"
-      className={cn("leading-none font-semibold", className)}
+    // @ts-expect-error - MUI Typography component prop type issue
+    <Typography
+      variant="h6"
+      component="div"
+      sx={{
+        lineHeight: 1,
+        fontWeight: 600,
+        ...sx,
+      }}
       {...props}
     />
   )
 }
 
-function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
+function CardDescription({ sx, ...props }: React.ComponentProps<typeof Typography>) {
   return (
-    <div
-      data-slot="card-description"
-      className={cn("text-muted-foreground text-sm", className)}
+    // @ts-expect-error - MUI Typography component prop type issue
+    <Typography
+      variant="body2"
+      component="div"
+      sx={{
+        color: "text.secondary",
+        ...sx,
+      }}
       {...props}
     />
   )
 }
 
-function CardAction({ className, ...props }: React.ComponentProps<"div">) {
+function CardAction({ sx, ...props }: React.ComponentProps<typeof Box>) {
   return (
-    <div
-      data-slot="card-action"
-      className={cn(
-        "col-start-2 row-span-2 row-start-1 self-start justify-self-end",
-        className
-      )}
+    <Box
+      sx={{
+        gridColumnStart: 2,
+        gridRow: "1 / span 2",
+        alignSelf: "start",
+        justifySelf: "end",
+        ...sx,
+      }}
       {...props}
     />
   )
 }
 
-function CardContent({ className, ...props }: React.ComponentProps<"div">) {
+function CardContent({ sx, ...props }: CardContentProps) {
   return (
-    <div
-      data-slot="card-content"
-      className={cn("px-6", className)}
+    <MuiCardContent
+      sx={{
+        px: 3,
+        ...sx,
+      }}
       {...props}
     />
   )
 }
 
-function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
+function CardFooter({ sx, ...props }: React.ComponentProps<typeof Box>) {
   return (
-    <div
-      data-slot="card-footer"
-      className={cn("flex items-center px-6 [.border-t]:pt-6", className)}
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        px: 3,
+        ...sx,
+      }}
       {...props}
     />
   )

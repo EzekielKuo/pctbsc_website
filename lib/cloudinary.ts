@@ -63,13 +63,27 @@ export function getOptimizedImageUrl(
   });
 }
 
+// Cloudinary 資源類型
+interface CloudinaryResource {
+  public_id: string;
+  secure_url: string;
+  folder?: string;
+  context?: Record<string, string>;
+  filename?: string;
+  width?: number;
+  height?: number;
+  format?: string;
+  bytes?: number;
+  created_at?: string;
+}
+
 // 從 Cloudinary 獲取資源列表
 export async function getCloudinaryResources(options: {
   folder?: string;
   maxResults?: number;
   tags?: string[];
   context?: boolean;
-} = {}): Promise<any[]> {
+} = {}): Promise<CloudinaryResource[]> {
   if (!process.env.CLOUDINARY_CLOUD_NAME) {
     throw new Error('Cloudinary 未配置，請設定環境變數');
   }
@@ -97,7 +111,20 @@ export async function getCloudinaryResources(options: {
 }
 
 // 將 Cloudinary 資源轉換為 GalleryImage
-export function transformCloudinaryResource(resource: any): any {
+export function transformCloudinaryResource(resource: CloudinaryResource): {
+  publicId: string;
+  url: string;
+  title: string;
+  description?: string;
+  category: '活動花絮' | '歷史常設展' | '宣傳組資訊' | '其他';
+  year?: number;
+  date?: string;
+  width?: number;
+  height?: number;
+  format?: string;
+  bytes?: number;
+  createdAt?: string;
+} {
   const context = resource.context || {};
   const folder = resource.folder || '';
   
@@ -114,9 +141,9 @@ export function transformCloudinaryResource(resource: any): any {
   return {
     publicId: resource.public_id,
     url: resource.secure_url,
-    title: context.caption || context.title || resource.filename || resource.public_id.split('/').pop(),
+    title: context.caption || context.title || resource.filename || resource.public_id.split('/').pop() || '',
     description: context.description || context.alt || undefined,
-    category: context.category || category,
+    category: (context.category as '活動花絮' | '歷史常設展' | '宣傳組資訊' | '其他') || category,
     year: context.year ? parseInt(context.year) : undefined,
     date: context.date || undefined,
     width: resource.width,
