@@ -39,7 +39,6 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
   const [infoAnchor, setInfoAnchor] = useState<null | HTMLElement>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [userLabel, setUserLabel] = useState('');
   const [textColor, setTextColor] = useState<'white' | 'black'>('white');
 
   // 共用的選單項 hover 色
@@ -88,15 +87,13 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
   const handleLogout = useCallback(() => {
     event({ action: 'click', category: 'button', label: '登出' });
     localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('username');
     localStorage.removeItem('loginTime');
     localStorage.removeItem('isAdmin');
     setIsLoggedIn(false);
     setIsAdmin(false);
-    setUserLabel('');
     closeAllMenusImmediately();
     
-    router.push('/login');
+    router.refresh();
     router.refresh();
   }, [router, closeAllMenusImmediately]);
 
@@ -138,13 +135,12 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
       }
       setIsLoggedIn(loggedIn);
       setIsAdmin(loggedIn && localStorage.getItem('isAdmin') === 'true');
-      setUserLabel(localStorage.getItem('username') || '');
     };
     checkLoginStatus();
     const interval = setInterval(checkLoginStatus, 60000);
     const handleStorageChange = (e: StorageEvent) => {
       // 當 key 為 null 時（手動 dispatch 的事件），也檢查登入狀態
-      if (!e.key || e.key === 'isLoggedIn' || e.key === 'loginTime' || e.key === 'isAdmin' || e.key === 'username') {
+      if (!e.key || e.key === 'isLoggedIn' || e.key === 'loginTime' || e.key === 'isAdmin') {
         checkLoginStatus();
       }
     };
@@ -200,6 +196,28 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
         <ListItem sx={{ pl: 4 }}>
           <Link href="/about/timeline" onClick={() => { trackNavigationClick('重要時程'); handleDrawerToggle(); }} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
             <ListItemText primary="重要時程" />
+          </Link>
+        </ListItem>
+        <Divider sx={{ my: 1 }} />
+        <ListItem><ListItemText primary="63神研" /></ListItem>
+        <ListItem sx={{ pl: 4 }}>
+          <Link href="/bsc/theme" onClick={() => { trackNavigationClick('神研班主題'); handleDrawerToggle(); }} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+            <ListItemText primary="神研班主題" />
+          </Link>
+        </ListItem>
+        <ListItem sx={{ pl: 4 }}>
+          <Link href="/bsc/info" onClick={() => { trackNavigationClick('活動資訊'); handleDrawerToggle(); }} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+            <ListItemText primary="活動資訊" />
+          </Link>
+        </ListItem>
+        <ListItem sx={{ pl: 4 }}>
+          <Link href="/bsc/schedule" onClick={() => { trackNavigationClick('活動日程表'); handleDrawerToggle(); }} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+            <ListItemText primary="活動日程表" />
+          </Link>
+        </ListItem>
+        <ListItem sx={{ pl: 4 }}>
+          <Link href="/bsc/questionnaire" onClick={() => { trackNavigationClick('每日問卷'); handleDrawerToggle(); }} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+            <ListItemText primary="每日問卷" />
           </Link>
         </ListItem>
         <Divider sx={{ my: 1 }} />
@@ -267,6 +285,39 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
               </Menu>
             </Box>
 
+            {/* 63神研選單 */}
+            <Box onMouseLeave={handleDelayedClose}>
+              <Button 
+                onMouseEnter={handleMenuOpen(setCamp63Anchor)}
+                sx={{ textTransform: 'none', color: textColor, fontSize: '1rem', px: 1.5, py: 1, transition: 'color 0.2s ease', '&:hover': { color: '#1976d2' } }}
+              >
+                63神研
+              </Button>
+              <Menu
+                anchorEl={camp63Anchor}
+                open={Boolean(camp63Anchor)}
+                onClose={closeAllMenusImmediately}
+                disableRestoreFocus
+                sx={{ pointerEvents: 'none' }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+                slotProps={commonMenuProps}
+              >
+                 <MenuItem onClick={closeAllMenusImmediately} sx={hoverStyle}>
+                  <Link href="/bsc/theme" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>神研班主題</Link>
+                </MenuItem>
+                 <MenuItem onClick={closeAllMenusImmediately} sx={hoverStyle}>
+                  <Link href="/bsc/info" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>活動資訊</Link>
+                </MenuItem>
+                 <MenuItem onClick={closeAllMenusImmediately} sx={hoverStyle}>
+                  <Link href="/bsc/schedule" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>活動日程表</Link>
+                </MenuItem>
+                 <MenuItem onClick={closeAllMenusImmediately} sx={hoverStyle}>
+                  <Link href="/bsc/questionnaire" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>每日問卷</Link>
+                </MenuItem>
+              </Menu>
+            </Box>
+
             {/* 神研前輩訪談選單 */}
             <Box onMouseLeave={handleDelayedClose}>
               <Button
@@ -298,36 +349,6 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                 <Link href="/interview/huang-hsu-hui" onClick={() => trackNavigationClick('第50屆後｜黃敘慧姊妹')} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>第50屆後｜黃敘慧姊妹</Link>
               </MenuItem>
             </Menu>
-            </Box>
-
-            {/* 63神研選單 */}
-            <Box onMouseLeave={handleDelayedClose}>
-              <Button 
-                onMouseEnter={handleMenuOpen(setCamp63Anchor)}
-                sx={{ textTransform: 'none', color: textColor, fontSize: '1rem', px: 1.5, py: 1, transition: 'color 0.2s ease', '&:hover': { color: '#1976d2' } }}
-              >
-                63神研
-              </Button>
-              <Menu
-                anchorEl={camp63Anchor}
-                open={Boolean(camp63Anchor)}
-                onClose={closeAllMenusImmediately}
-                disableRestoreFocus
-                sx={{ pointerEvents: 'none' }}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'center' }}
-                slotProps={commonMenuProps}
-              >
-                 <MenuItem onClick={closeAllMenusImmediately} sx={hoverStyle}>
-                  <Link href="/bsc/theme" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>神研班主題</Link>
-                </MenuItem>
-                 <MenuItem onClick={closeAllMenusImmediately} sx={hoverStyle}>
-                  <Link href="/bsc/info" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>活動資訊</Link>
-                </MenuItem>
-                 <MenuItem onClick={closeAllMenusImmediately} sx={hoverStyle}>
-                  <Link href="/bsc/schedule" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>活動日程表</Link>
-                </MenuItem>
-              </Menu>
             </Box>
           </Box>
 
@@ -390,12 +411,6 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
               <InstagramIcon fontSize="small" />
             </IconButton>
 
-            {isLoggedIn && (
-              <Typography variant="caption" sx={{ fontWeight: 700, color: '#1976d2' }}>
-                {userLabel || (isAdmin ? 'admin' : 'user')}
-              </Typography>
-            )}
-
             {isLoggedIn ? (
               <Box onMouseLeave={handleDelayedClose}>
                 <IconButton 
@@ -425,20 +440,18 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                 component={Link} 
                 href="/login" 
                 onClick={() => trackNavigationClick('登入')}
-                variant="outlined" 
+                variant="text" 
                 sx={{ 
                   textTransform: 'none', 
                   color: '#1976d2',
-                  borderColor: '#1976d2',
                   transition: 'all 0.2s ease',
                   '&:hover': { 
                     color: '#1565c0', 
-                    borderColor: '#1565c0', 
                     backgroundColor: 'rgba(21, 101, 192, 0.08)' 
                   } 
                 }}
               >
-                Log In
+                Login
               </Button>
             )}
           </Box>

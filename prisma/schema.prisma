@@ -133,3 +133,23 @@ model VerificationToken {
   @@unique([identifier, token])
   @@map("verification_tokens")
 }
+
+model AboutBSC {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String // 什麼是神研班的內容
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("about_bsc")
+}
+
+model QuestionnaireLink {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  doorIndex Int // 門的索引 (0-5)
+  url       String // 問卷連結
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([doorIndex])
+  @@map("questionnaire_links")
+}

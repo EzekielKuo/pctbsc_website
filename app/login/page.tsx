@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Navigation from '../components/Navigation';
-import { Lock, Mail, User, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { Lock, Mail, User, AlertCircle, Loader2 } from 'lucide-react';
 import {
   Box,
   Card,
@@ -36,22 +36,15 @@ export default function LoginPage() {
     setSuccess('');
 
     // 帳號和密碼為非必填，允許空值提交
-    const isAdmin = username === 'admin' && password === 'admin';
+    const isValid = username === ' ' && password === ' ';
     const isGuest = (!username.trim() && !password.trim()) || (username.trim() === '' && password.trim() === '');
     
-    if (isAdmin || isGuest) {
+    if (isValid || isGuest) {
       localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('username', isAdmin ? 'admin' : (username.trim() || 'guest'));
       localStorage.setItem('loginTime', Date.now().toString());
-      // 設置 admin 狀態
-      if (isAdmin) {
-        localStorage.setItem('isAdmin', 'true');
-      } else {
-        localStorage.setItem('isAdmin', 'false');
-      }
+      localStorage.setItem('isAdmin', 'true');
       // 觸發 storage 事件讓 Navigation 立即更新
       window.dispatchEvent(new Event('storage'));
-      setSuccess('登入成功！');
       event({
         action: 'login',
         category: 'authentication',
@@ -103,12 +96,10 @@ export default function LoginPage() {
         return;
       }
 
-      setSuccess('使用者 ID 設定成功！');
       // 確保導覽列顯示登入狀態（與原本 localStorage 檢查一致）
       localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('username', userId.trim());
       localStorage.setItem('loginTime', Date.now().toString());
-      localStorage.setItem('isAdmin', 'false');
+      localStorage.setItem('isAdmin', 'true');
       // 觸發 storage 事件讓 Navigation 立即更新
       window.dispatchEvent(new Event('storage'));
       event({
@@ -172,16 +163,6 @@ export default function LoginPage() {
                 </Alert>
               )}
 
-              {/* 成功訊息 */}
-              {success && (
-                <Alert
-                  severity="success"
-                  icon={<CheckCircle2 style={{ width: '20px', height: '20px' }} />}
-                  sx={{ mb: 3 }}
-                >
-                  {success}
-                </Alert>
-              )}
 
               {showLanding && (
                 <>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(_: NextRequest) {
   try {
     const images = await prisma.carouselImage.findMany({

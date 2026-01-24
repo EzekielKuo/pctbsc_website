@@ -20,10 +20,10 @@ export default function ScrollIndicator() {
       // 只有在頁面可以滾動時才檢查是否在底部
       const isAtBottom = maxScroll > 0 && scrollTop >= maxScroll - 5;
       
-      // 向上按鈕：只在頂部時顯示（且不在底部）
-      // 向下按鈕：只在底部時顯示（且不在頂部）
-      setShowTop(isAtTop && !isAtBottom);
-      setShowBottom(isAtBottom && !isAtTop);
+      // 向上按鈕：只在底部時顯示（往上滾動）
+      // 向下按鈕：只在頂部時顯示（往下滾動）
+      setShowTop(isAtBottom && !isAtTop);
+      setShowBottom(isAtTop && !isAtBottom);
     };
 
     // 使用 setTimeout 確保 DOM 已完全載入
@@ -51,12 +51,12 @@ export default function ScrollIndicator() {
 
   return (
     <>
-      {/* 向上滾動按鈕 - 只在頂部時顯示 */}
+      {/* 向上滾動按鈕 - 只在底部時顯示 */}
       {showTop && (
         <Box
           sx={{
             position: 'fixed',
-            bottom: 100,
+            bottom: 24,
             right: 24,
             zIndex: 1000,
           }}
@@ -67,6 +67,7 @@ export default function ScrollIndicator() {
               backgroundColor: 'rgba(0, 0, 0, 0.6)',
               color: 'white',
               backdropFilter: 'blur(10px)',
+              border: '1px solid white',
               '&:hover': {
                 backgroundColor: 'rgba(0, 0, 0, 0.8)',
               },
@@ -80,7 +81,7 @@ export default function ScrollIndicator() {
         </Box>
       )}
 
-      {/* 向下滾動按鈕 - 只在底部時顯示 */}
+      {/* 向下滾動按鈕 - 只在頂部時顯示 */}
       {showBottom && (
         <Box
           sx={{
@@ -96,6 +97,7 @@ export default function ScrollIndicator() {
               backgroundColor: 'rgba(0, 0, 0, 0.6)',
               color: 'white',
               backdropFilter: 'blur(10px)',
+              border: '1px solid white',
               '&:hover': {
                 backgroundColor: 'rgba(0, 0, 0, 0.8)',
               },

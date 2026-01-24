@@ -68,6 +68,7 @@ async function fetchInstagramDescription(url: string): Promise<string | null> {
   return null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(_: NextRequest) {
   try {
     const posts = await prisma.instagramPost.findMany({

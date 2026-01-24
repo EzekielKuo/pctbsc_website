@@ -28,6 +28,14 @@ function getInstagramEmbedUrl(url: string): string {
   return url;
 }
 
+// 解碼 HTML 實體
+function decodeHTMLEntities(text: string): string {
+  if (typeof window === 'undefined') return text;
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = text;
+  return textarea.value;
+}
+
 export default function Promotion({ title = '宣傳組資訊' }: PromotionProps) {
   const [posts, setPosts] = useState<InstagramPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -283,8 +291,15 @@ export default function Promotion({ title = '宣傳組資訊' }: PromotionProps)
                     key={post.id}
                     data-post
                     sx={{
-                      flex: '0 0 17%',
+                      flex: '0 0 auto',
+                      width: '360px',
                       position: 'relative',
+                      '@media (max-width: 960px)': {
+                        width: '280px',
+                      },
+                      '@media (max-width: 600px)': {
+                        width: '240px',
+                      },
                     }}
                   >
                     <Box
@@ -317,27 +332,6 @@ export default function Promotion({ title = '宣傳組資訊' }: PromotionProps)
                           display: 'block',
                         }}
                       />
-                      {post.description && (
-                        <Box
-                          sx={{
-                            p: 2,
-                            bgcolor: 'white',
-                            borderTop: '1px solid',
-                            borderColor: 'grey.200',
-                          }}
-                        >
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              color: 'text.primary',
-                              whiteSpace: 'pre-wrap',
-                              wordBreak: 'break-word',
-                            }}
-                          >
-                            {post.description}
-                          </Typography>
-                        </Box>
-                      )}
                     </Box>
                   </Box>
                 ))}

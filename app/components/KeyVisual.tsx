@@ -1,7 +1,6 @@
 'use client';
 
-import { Box, Container } from '@mui/material';
-import Image from 'next/image';
+import { Box } from '@mui/material';
 
 interface KeyVisualProps {
   imageUrl?: string | null;

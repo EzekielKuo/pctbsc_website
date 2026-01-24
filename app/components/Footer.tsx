@@ -1,7 +1,6 @@
 'use client';
 
 import { Box, Container, Grid, Typography, Link as MuiLink, Divider } from '@mui/material';
-import Link from 'next/link';
 import packageJson from '@/package.json';
 import { event } from '@/lib/gtag';
 

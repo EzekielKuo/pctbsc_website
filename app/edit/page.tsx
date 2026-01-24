@@ -42,12 +42,19 @@ interface InstagramPost {
   order?: number;
 }
 
+interface QuestionnaireLink {
+  id?: string;
+  doorIndex: number;
+  url: string;
+}
+
 export default function EditPage() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
   const [keyVisual, setKeyVisual] = useState<{ id?: string; url: string; publicId?: string | null } | null>(null);
-  const [keyVisualPage, setKeyVisualPage] = useState<'home' | 'bible'>('home');
+  const [keyVisualPage, setKeyVisualPage] = useState<'home' | 'bible' | 'questionnaire'>('home');
+  const [questionnaireLinks, setQuestionnaireLinks] = useState<QuestionnaireLink[]>([]);
   const [schedule, setSchedule] = useState<{ id?: string; url: string; publicId?: string | null } | null>(null);
   const [images, setImages] = useState<CarouselImage[]>([]);
   const [instagramPosts, setInstagramPosts] = useState<InstagramPost[]>([]);
@@ -72,6 +79,10 @@ export default function EditPage() {
   const [bibleTopicIntro, setBibleTopicIntro] = useState('');
   const [bibleActivityInfo, setBibleActivityInfo] = useState('');
   const [bibleSignupInfo, setBibleSignupInfo] = useState('');
+  const [aboutBSCContent, setAboutBSCContent] = useState('');
+  const [aboutBSCInitialLoad, setAboutBSCInitialLoad] = useState(true);
+  const [aboutBSCSaving, setAboutBSCSaving] = useState(false);
+  const [aboutBSCSaved, setAboutBSCSaved] = useState(false);
 
   // 處理 Dialog 打開/關閉時的滾動控制
   useEffect(() => {
@@ -130,11 +141,31 @@ export default function EditPage() {
           fetchSchedule();
           fetchImages();
           fetchInstagramPosts();
+          fetchAboutBSC();
+          fetchQuestionnaireLinks();
         }
       }
     };
     checkLogin();
   }, [router]);
+
+  const fetchQuestionnaireLinks = async () => {
+    try {
+      const response = await fetch('/api/questionnaire');
+      const result = await response.json();
+      if (result.success) {
+        // 确保所有6个门都有对应的链接对象
+        const links: QuestionnaireLink[] = [];
+        for (let i = 0; i < 6; i++) {
+          const existingLink = result.data.find((l: QuestionnaireLink) => l.doorIndex === i);
+          links.push(existingLink || { doorIndex: i, url: '' });
+        }
+        setQuestionnaireLinks(links);
+      }
+    } catch (err) {
+      console.error('获取问卷链接错误:', err);
+    }
+  };
 
   const fetchKeyVisual = async () => {
     try {
@@ -189,6 +220,104 @@ export default function EditPage() {
       if (!skipLoading) {
         setLoading(false);
       }
+    }
+  };
+
+  const fetchAboutBSC = async () => {
+    try {
+      const response = await fetch('/api/about-bsc');
+      const result = await response.json();
+      if (result.success && result.data) {
+        setAboutBSCContent(result.data.content || '');
+      }
+      setAboutBSCInitialLoad(false);
+    } catch (err) {
+      console.error('獲取「什麼是神研班？」內容錯誤:', err);
+      setAboutBSCInitialLoad(false);
+    }
+  };
+
+  const handleUpdateQuestionnaireLink = async (doorIndex: number, url: string) => {
+    try {
+      const response = await fetch('/api/questionnaire', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ doorIndex, url }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        // 更新本地状态
+        const newLinks = [...questionnaireLinks];
+        newLinks[doorIndex] = { doorIndex, url };
+        setQuestionnaireLinks(newLinks);
+        setSuccess('問卷連結已更新！');
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError(result.error || '更新失敗');
+        setTimeout(() => setError(''), 3000);
+      }
+    } catch (err) {
+      console.error('更新問卷連結錯誤:', err);
+      setError('更新失敗');
+      setTimeout(() => setError(''), 3000);
+    }
+  };
+
+  // 自動儲存「什麼是神研班？」內容
+  useEffect(() => {
+    // 跳過初始載入
+    if (aboutBSCInitialLoad) return;
+
+    // 立即顯示「儲存中...」
+    setAboutBSCSaving(true);
+    setAboutBSCSaved(false);
+
+    // 使用 debounce 延遲保存（1秒後保存）
+    const timer = setTimeout(async () => {
+      try {
+        await fetch('/api/about-bsc', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: aboutBSCContent }),
+        });
+        setAboutBSCSaving(false);
+        setAboutBSCSaved(true);
+      } catch (err) {
+        console.error('自動保存「什麼是神研班？」內容錯誤:', err);
+        setAboutBSCSaving(false);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [aboutBSCContent, aboutBSCInitialLoad]);
+
+  const handleSaveAboutBSC = async () => {
+    try {
+      setLoading(true);
+      setLoadingMessage('正在保存...');
+      
+      const response = await fetch('/api/about-bsc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: aboutBSCContent }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setSuccess('保存成功！');
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError(result.error || '保存失敗');
+        setTimeout(() => setError(''), 3000);
+      }
+    } catch (err) {
+      console.error('保存「什麼是神研班？」內容錯誤:', err);
+      setError('保存失敗');
+      setTimeout(() => setError(''), 3000);
+    } finally {
+      setLoading(false);
+      setLoadingMessage('');
     }
   };
 
@@ -632,7 +761,7 @@ export default function EditPage() {
   };
 
   const handleDeleteInstagramPost = async (id: string) => {
-    if (!confirm('確定要刪除這個 Instagram 貼文嗎？')) return;
+    if (!confirm('確定要刪除嗎？')) return;
 
     try {
       setDeleting(true);
@@ -693,6 +822,18 @@ export default function EditPage() {
               variant={keyVisualPage === 'home' ? 'contained' : 'outlined'}
               size="small"
               onClick={() => setKeyVisualPage('home')}
+              sx={{
+                border: keyVisualPage === 'home' ? 'none' : '2px solid',
+                borderColor: '#B19CD9',
+                color: keyVisualPage === 'home' ? '#fff' : '#B19CD9',
+                bgcolor: keyVisualPage === 'home' ? '#B19CD9' : 'transparent',
+                fontWeight: 700,
+                '&:hover': {
+                  border: keyVisualPage === 'home' ? 'none' : '2px solid',
+                  borderColor: '#9F86C0',
+                  bgcolor: keyVisualPage === 'home' ? '#9F86C0' : 'rgba(177, 156, 217, 0.08)',
+                },
+              }}
             >
               主頁
             </Button>
@@ -700,8 +841,39 @@ export default function EditPage() {
               variant={keyVisualPage === 'bible' ? 'contained' : 'outlined'}
               size="small"
               onClick={() => setKeyVisualPage('bible')}
+              sx={{
+                border: keyVisualPage === 'bible' ? 'none' : '2px solid',
+                borderColor: '#B19CD9',
+                color: keyVisualPage === 'bible' ? '#fff' : '#B19CD9',
+                bgcolor: keyVisualPage === 'bible' ? '#B19CD9' : 'transparent',
+                fontWeight: 700,
+                '&:hover': {
+                  border: keyVisualPage === 'bible' ? 'none' : '2px solid',
+                  borderColor: '#9F86C0',
+                  bgcolor: keyVisualPage === 'bible' ? '#9F86C0' : 'rgba(177, 156, 217, 0.08)',
+                },
+              }}
             >
               神研班頁面
+            </Button>
+            <Button
+              variant={keyVisualPage === 'questionnaire' ? 'contained' : 'outlined'}
+              size="small"
+              onClick={() => setKeyVisualPage('questionnaire')}
+              sx={{
+                border: keyVisualPage === 'questionnaire' ? 'none' : '2px solid',
+                borderColor: '#B19CD9',
+                color: keyVisualPage === 'questionnaire' ? '#fff' : '#B19CD9',
+                bgcolor: keyVisualPage === 'questionnaire' ? '#B19CD9' : 'transparent',
+                fontWeight: 700,
+                '&:hover': {
+                  border: keyVisualPage === 'questionnaire' ? 'none' : '2px solid',
+                  borderColor: '#9F86C0',
+                  bgcolor: keyVisualPage === 'questionnaire' ? '#9F86C0' : 'rgba(177, 156, 217, 0.08)',
+                },
+              }}
+            >
+              每日問卷
             </Button>
           </Stack>
 
@@ -726,7 +898,7 @@ export default function EditPage() {
 
             {images.length === 0 ? (
               <Typography variant="body1" color="text.secondary" align="center" sx={{ py: 4 }}>
-                目前尚無圖片，點擊「新增圖片」開始添加
+                目前尚無圖片
               </Typography>
             ) : (
               <Grid container spacing={2}>
@@ -808,13 +980,9 @@ export default function EditPage() {
                 Instagram 貼文管理
               </Typography>
               <Button
-                variant="outlined"
+                variant="text"
                 startIcon={<Plus />}
                 onClick={handleAddInstagramPost}
-                sx={{
-                  borderWidth: 2,
-                  '&:hover': { borderWidth: 2 },
-                }}
               >
                 新增貼文
               </Button>
@@ -822,7 +990,7 @@ export default function EditPage() {
 
             {instagramPosts.length === 0 ? (
               <Typography variant="body1" color="text.secondary" align="center" sx={{ py: 4 }}>
-                目前尚無 Instagram 貼文，點擊「新增貼文」開始添加
+                目前尚無 Instagram 貼文
               </Typography>
             ) : (
               <Grid container spacing={2}>
@@ -836,7 +1004,7 @@ export default function EditPage() {
                         pr: 0.5,
                         py: 2,
                         border: '1px solid',
-                        borderColor: 'divider',
+                        borderColor: 'primary.main',
                         borderRadius: 1,
                         bgcolor: 'background.paper',
                         minHeight: 60,
@@ -889,8 +1057,41 @@ export default function EditPage() {
               </Grid>
             )}
           </Paper>
+
+          {/* 什麼是神研班？ */}
+          <Paper sx={{ p: 3, mt: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6">
+                什麼是神研班？
+              </Typography>
+              <Typography 
+                sx={{ 
+                  color: aboutBSCSaving ? 'primary.main' : aboutBSCSaved ? 'success.main' : 'text.disabled',
+                  fontWeight: 700,
+                  fontSize: '0.875rem',
+                  letterSpacing: '0.02857em',
+                  textTransform: 'uppercase',
+                  minWidth: 100,
+                  textAlign: 'center',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {aboutBSCSaving ? '儲存中...' : aboutBSCSaved ? '儲存完成' : ''}
+              </Typography>
+            </Box>
+            <TextField
+              fullWidth
+              multiline
+              minRows={5}
+              placeholder="請輸入什麼是神研班的描述"
+              value={aboutBSCContent}
+              onChange={(e) => setAboutBSCContent(e.target.value)}
+            />
+          </Paper>
             </>
-          ) : (
+          ) : keyVisualPage === 'bible' ? (
             <>
               <Grid container columnSpacing={2} rowSpacing={5} sx={{ mb: 4 }}>
                 <Grid size={{ xs: 12, md: 6 }}>
@@ -1171,6 +1372,57 @@ export default function EditPage() {
                   </Box>
                 </Paper>
               </Stack>
+            </>
+          ) : (
+            <>
+              <Paper sx={{ p: 3, mb: 3 }}>
+                <Typography variant="h6" sx={{ mb: 3 }}>
+                  每日問卷連結設定
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+                  為每個門設定對應的問卷連結。只有在開門時間內，該連結才能被點擊。
+                </Typography>
+
+                <Stack spacing={3}>
+                  {[
+                    { index: 0, label: '左上門 (1/26 17:00 - 1/27 17:00)' },
+                    { index: 1, label: '中上門 (1/27 17:00 - 1/28 17:00)' },
+                    { index: 2, label: '右上門 (1/28 17:00 - 1/29 17:00)' },
+                    { index: 3, label: '左下門 (1/29 17:00 - 1/30 17:00)' },
+                    { index: 4, label: '中下門 (1/30 17:00 - 1/31 11:00)' },
+                    { index: 5, label: '右下門 (1/31 11:00 - 1/31 23:59)' },
+                  ].map((door) => (
+                    <Box key={door.index}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                        {door.label}
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        placeholder="請輸入問卷連結（例如：https://forms.gle/...）"
+                        value={questionnaireLinks[door.index]?.url || ''}
+                        onChange={(e) => {
+                          const newLinks = [...questionnaireLinks];
+                          newLinks[door.index] = { doorIndex: door.index, url: e.target.value };
+                          setQuestionnaireLinks(newLinks);
+                        }}
+                        onBlur={() => {
+                          // 當失去焦點時保存
+                          if (questionnaireLinks[door.index]) {
+                            handleUpdateQuestionnaireLink(door.index, questionnaireLinks[door.index].url);
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          // Enter 鍵也觸發保存
+                          if (e.key === 'Enter' && questionnaireLinks[door.index]) {
+                            handleUpdateQuestionnaireLink(door.index, questionnaireLinks[door.index].url);
+                          }
+                        }}
+                        size="small"
+                      />
+                    </Box>
+                  ))}
+                </Stack>
+              </Paper>
             </>
           )}
         </Container>
@@ -1474,8 +1726,7 @@ export default function EditPage() {
                   handleSaveInstagramPost();
                 }
               }}
-              placeholder="輸入貼文名稱（選填）"
-              helperText="為這個貼文設定一個名稱，方便識別"
+              helperText="為這個貼文設定一個名稱"
             />
             <TextField
               label="Instagram 貼文 URL"
@@ -1488,8 +1739,8 @@ export default function EditPage() {
                   handleSaveInstagramPost();
                 }
               }}
-              placeholder="https://www.instagram.com/p/ABC123/ 或 https://www.instagram.com/reel/ABC123/"
-              helperText="請貼上 Instagram 貼文或 Reel 的完整 URL，系統會自動抓取貼文文字敘述"
+
+              helperText="請貼上 Instagram 貼文的完整 URL(連結)"
               required
             />
           </Stack>

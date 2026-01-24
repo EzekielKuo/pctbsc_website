@@ -32,12 +32,12 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL || 'mongodb://localhost:27017/test' }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Generate Prisma Client
         run: npx prisma generate
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL || 'mongodb://localhost:27017/test' }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
@@ -67,12 +67,12 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL || 'mongodb://localhost:27017/test' }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Generate Prisma Client
         run: npx prisma generate
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL || 'mongodb://localhost:27017/test' }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       # --- 加入快取機制 ---
       - name: Get Playwright version
@@ -98,9 +98,9 @@ jobs:
       - name: Run Playwright tests
         run: yarn test
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL || 'mongodb://localhost:27017/test' }}
-          AUTH_SECRET: ${{ secrets.AUTH_SECRET || 'test-secret' }}
-          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL || 'http://localhost:3000' }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          NEXTAUTH_URL: 'http://localhost:3000'
           PLAYWRIGHT_TEST_BASE_URL: 'http://localhost:3000'
 
       - name: Upload test results
@@ -130,19 +130,19 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL || 'mongodb://localhost:27017/test' }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Generate Prisma Client
         run: npx prisma generate
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL || 'mongodb://localhost:27017/test' }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Build Next.js
         run: yarn build
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL || 'mongodb://localhost:27017/test' }}
-          AUTH_SECRET: ${{ secrets.AUTH_SECRET || 'test-secret' }}
-          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL || 'http://localhost:3000' }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          NEXTAUTH_URL: 'https://pctbsc-website.vercel.app'
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
