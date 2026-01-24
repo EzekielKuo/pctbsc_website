@@ -10,7 +10,7 @@ declare global {
       targetId: string | object,
       config?: object
     ) => void;
-    dataLayer: any[];
+    dataLayer: unknown[];
   }
 }
 

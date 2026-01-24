@@ -162,7 +162,13 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
   // 選單共用設定：解決間隙問題
-  const commonMenuProps = {
+  const commonMenuProps: {
+    paper?: {
+      onMouseEnter?: () => void;
+      onMouseLeave?: () => void;
+      sx?: Record<string, unknown>;
+    };
+  } = {
     paper: {
       onMouseEnter: clearTimer,
       onMouseLeave: handleDelayedClose,
@@ -174,7 +180,7 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
         color: 'white', 
         pointerEvents: 'auto' 
       }
-    } as any
+    }
   };
 
   const drawer = (

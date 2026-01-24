@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const collection = db.collection<GalleryImage>('gallery');
 
     // 建立查詢條件
-    const query: any = {};
+    const query: { category?: string; year?: number } = {};
     if (category) {
       query.category = category;
     }
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date(),
     };
 
-    const result = await collection.insertOne(newImage as any);
+    const result = await collection.insertOne(newImage);
 
     return NextResponse.json({
       success: true,

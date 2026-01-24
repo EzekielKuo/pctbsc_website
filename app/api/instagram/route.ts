@@ -68,7 +68,7 @@ async function fetchInstagramDescription(url: string): Promise<string | null> {
   return null;
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(_: NextRequest) {
   try {
     const posts = await prisma.instagramPost.findMany({
       orderBy: [
@@ -144,7 +144,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const updateData: any = {};
+    const updateData: { url?: string; description?: string | null } = {};
     if (url) {
       // 驗證 Instagram URL 格式
       if (!url.includes('instagram.com/p/') && !url.includes('instagram.com/reel/')) {

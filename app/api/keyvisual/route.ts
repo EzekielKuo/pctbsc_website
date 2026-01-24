@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(request: NextRequest) {
+export async function GET(_: NextRequest) {
   try {
     const keyVisual = await prisma.keyVisual.findFirst({
       orderBy: { updatedAt: 'desc' },
@@ -82,9 +82,10 @@ export async function DELETE(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('刪除主視覺圖片錯誤:', error);
-    if (error.code === 'P2025') {
+    const err = error as { code?: string };
+    if (err.code === 'P2025') {
       return NextResponse.json(
         { success: false, error: '主視覺圖片不存在' },
         { status: 404 }

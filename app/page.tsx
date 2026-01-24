@@ -29,7 +29,7 @@ export default function Home() {
         const response = await fetch('/api/carousel');
         const result = await response.json();
         if (result.success && result.data) {
-          setCarouselImages(result.data.map((img: any) => img.url));
+          setCarouselImages(result.data.map((img: { url: string }) => img.url));
         }
       } catch (err) {
         console.error('獲取輪播圖片錯誤:', err);

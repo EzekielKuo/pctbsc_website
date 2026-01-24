@@ -50,19 +50,20 @@ export async function POST(request: NextRequest) {
         publicId: result.publicId,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('上傳圖片錯誤:', error);
     
     // 提供更詳細的錯誤訊息
     let errorMessage = '上傳圖片失敗';
-    if (error?.error?.message) {
-      if (error.error.message.includes('Timeout') || error.error.http_code === 499) {
+    const err = error as { error?: { message?: string; http_code?: number }; message?: string };
+    if (err?.error?.message) {
+      if (err.error.message.includes('Timeout') || err.error.http_code === 499) {
         errorMessage = '上傳超時，請檢查網路連線或稍後再試';
       } else {
-        errorMessage = `上傳失敗: ${error.error.message}`;
+        errorMessage = `上傳失敗: ${err.error.message}`;
       }
-    } else if (error?.message) {
-      errorMessage = `上傳失敗: ${error.message}`;
+    } else if (err?.message) {
+      errorMessage = `上傳失敗: ${err.message}`;
     }
     
     return NextResponse.json(

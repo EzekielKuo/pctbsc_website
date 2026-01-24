@@ -14,10 +14,11 @@ export const prisma = (globalForPrisma.prisma ||
         async update({ args, query }) {
           try {
             return await query(args);
-          } catch (error: any) {
+          } catch (error: unknown) {
             // 如果是更新 session 時找不到記錄的錯誤（登出時的競態條件），返回 null
             // 這不會影響功能，因為 session 已經被刪除了
-            if (error.code === 'P2025') {
+            const err = error as { code?: string };
+            if (err.code === 'P2025') {
               return null;
             }
             throw error;

@@ -6,10 +6,15 @@ import { event } from '@/lib/gtag';
 
 export default function usePageTime() {
   const pathname = usePathname();
-  const startTimeRef = useRef<number>(Date.now());
+  const startTimeRef = useRef<number>(0);
   const pathnameRef = useRef<string>(pathname || '');
 
   useEffect(() => {
+    // 初始化開始時間（如果還沒初始化）
+    if (startTimeRef.current === 0) {
+      startTimeRef.current = Date.now();
+    }
+    
     // 當路徑改變時，記錄上一頁的停留時間
     if (pathnameRef.current && pathnameRef.current !== pathname) {
       const timeSpent = Math.round((Date.now() - startTimeRef.current) / 1000); // 轉換為秒

@@ -39,7 +39,7 @@ function Button({
   const muiSize = sizeMap[size] || "medium"
 
   const buttonSx = React.useMemo(() => {
-    const baseSx: any = {
+    const baseSx: Record<string, unknown> = {
       ...sx,
     }
 
@@ -79,7 +79,7 @@ function Button({
   }, [variant, size, sx])
 
   if (asChild && React.isValidElement(props.children)) {
-    return React.cloneElement(props.children as React.ReactElement<any>, {
+    return React.cloneElement(props.children as React.ReactElement, {
       ...props,
       variant: muiVariant,
       size: muiSize,

@@ -13,12 +13,19 @@ export default function PageTransition({ children }: PageTransitionProps) {
 
   useEffect(() => {
     // 頁面切換時重置動畫
-    setIsVisible(false);
-    const timer = setTimeout(() => {
+    // 使用 setTimeout 避免在 effect 中同步調用 setState
+    const timer1 = setTimeout(() => {
+      setIsVisible(false);
+    }, 0);
+    
+    const timer2 = setTimeout(() => {
       setIsVisible(true);
     }, 10);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
   }, [pathname]);
 
   return (

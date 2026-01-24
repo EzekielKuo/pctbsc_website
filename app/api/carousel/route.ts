@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(request: NextRequest) {
+export async function GET(_: NextRequest) {
   try {
     const images = await prisma.carouselImage.findMany({
       orderBy: [
@@ -75,7 +75,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const updateData: any = {};
+    const updateData: { url?: string; publicId?: string; order?: number } = {};
     if (url) updateData.url = url;
     if (publicId !== undefined) updateData.publicId = publicId;
     if (order !== undefined) updateData.order = order;

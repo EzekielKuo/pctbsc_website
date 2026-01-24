@@ -107,9 +107,10 @@ export async function DELETE(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('刪除留言錯誤:', error);
-    if (error.code === 'P2025') {
+    const err = error as { code?: string };
+    if (err.code === 'P2025') {
       return NextResponse.json(
         { success: false, error: '留言不存在' },
         { status: 404 }
