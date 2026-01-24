@@ -1,62 +1,100 @@
 import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import { Button as MuiButton, ButtonProps as MuiButtonProps } from "@mui/material"
 
-import { cn } from "@/lib/utils"
+type ButtonVariant = "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
+type ButtonSize = "default" | "sm" | "lg" | "icon" | "icon-sm" | "icon-lg"
 
-const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-  {
-    variants: {
-      variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline:
-          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
-      },
-      size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
-        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
-        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
-        icon: "size-9",
-        "icon-sm": "size-8",
-        "icon-lg": "size-10",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-)
+interface ButtonProps extends Omit<MuiButtonProps, "variant" | "size"> {
+  variant?: ButtonVariant
+  size?: ButtonSize
+  asChild?: boolean
+}
+
+const variantMap: Record<ButtonVariant, MuiButtonProps["variant"]> = {
+  default: "contained",
+  destructive: "contained",
+  outline: "outlined",
+  secondary: "contained",
+  ghost: "text",
+  link: "text",
+}
+
+const sizeMap: Record<ButtonSize, "small" | "medium" | "large"> = {
+  default: "medium",
+  sm: "small",
+  lg: "large",
+  icon: "medium",
+  "icon-sm": "small",
+  "icon-lg": "large",
+}
 
 function Button({
-  className,
   variant = "default",
   size = "default",
   asChild = false,
+  sx,
   ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
-  }) {
-  const Comp = asChild ? Slot : "button"
+}: ButtonProps) {
+  const muiVariant = variantMap[variant] || "contained"
+  const muiSize = sizeMap[size] || "medium"
+
+  const buttonSx = React.useMemo(() => {
+    const baseSx: any = {
+      ...sx,
+    }
+
+    // 處理 variant 特定的樣式
+    if (variant === "destructive") {
+      baseSx.bgcolor = "error.main"
+      baseSx["&:hover"] = {
+        ...baseSx["&:hover"],
+        bgcolor: "error.dark",
+      }
+    }
+
+    if (variant === "link") {
+      baseSx.textDecoration = "underline"
+      baseSx.textUnderlineOffset = "4px"
+    }
+
+    // 處理 icon 尺寸
+    if (size === "icon") {
+      baseSx.minWidth = "36px"
+      baseSx.width = "36px"
+      baseSx.height = "36px"
+      baseSx.padding = 0
+    } else if (size === "icon-sm") {
+      baseSx.minWidth = "32px"
+      baseSx.width = "32px"
+      baseSx.height = "32px"
+      baseSx.padding = 0
+    } else if (size === "icon-lg") {
+      baseSx.minWidth = "40px"
+      baseSx.width = "40px"
+      baseSx.height = "40px"
+      baseSx.padding = 0
+    }
+
+    return baseSx
+  }, [variant, size, sx])
+
+  if (asChild && React.isValidElement(props.children)) {
+    return React.cloneElement(props.children as React.ReactElement<any>, {
+      ...props,
+      variant: muiVariant,
+      size: muiSize,
+      sx: buttonSx,
+    })
+  }
 
   return (
-    <Comp
-      data-slot="button"
-      data-variant={variant}
-      data-size={size}
-      className={cn(buttonVariants({ variant, size, className }))}
+    <MuiButton
+      variant={muiVariant}
+      size={muiSize}
+      sx={buttonSx}
       {...props}
     />
   )
 }
 
-export { Button, buttonVariants }
+export { Button }

@@ -1,50 +1,3 @@
-@import 'tailwindcss';
-
-@custom-variant dark (&:is(.dark *));
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
-}
-
 body {
   font-family: var(--font-geist-sans), 'Microsoft JhengHei', '微軟正黑體', Arial, Helvetica, sans-serif;
 }
@@ -123,81 +76,14 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-/* 
- * Tailwind CSS Layers - 確保優先級正確
- * 
- * 樣式載入順序（從前到後）：
- * 1. MUI Emotion 樣式（通過 injectFirst 插入在最前面）
- * 2. Tailwind @layer base（基礎樣式）
- * 3. Tailwind @layer components（組件樣式）
- * 4. Tailwind @layer utilities（工具類，優先級最高）
- * 
- * 關鍵：使用 @layer utilities 來封裝所有 Tailwind utility classes，
- * 確保它們的優先級高於 MUI 的樣式
- */
-
-/* Base layer - 基礎重置，但避免與 CssBaseline 衝突 */
-@layer base {
-  /* 只重置必要的樣式，避免與 MUI CssBaseline 完全衝突 */
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
-  
-  body {
-    @apply bg-background text-foreground;
-    /* 保留 margin/padding 重置，但使用 Tailwind 的方式 */
-    margin: 0;
-    padding: 0;
-  }
+/* 基礎樣式重置 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-/* Components layer - 組件樣式 */
-@layer components {
-  /* 可以在這裡定義自訂組件樣式 */
-}
-
-/* Utilities layer - 工具類，優先級最高 */
-/* 這個 layer 會自動包含所有 Tailwind utility classes */
-@layer utilities {
-  /* 確保 Tailwind utilities 可以覆蓋 MUI 樣式 */
-  /* 強制 Tailwind utilities 優先級高於 MUI */
-  
-  /* 強制覆蓋 MUI 可能重置的常用 Tailwind utilities */
-  .flex {
-    display: flex !important;
-  }
-  
-  .flex-col {
-    flex-direction: column !important;
-  }
-  
-  .items-center {
-    align-items: center !important;
-  }
-  
-  .justify-center {
-    justify-content: center !important;
-  }
-  
-  .text-center {
-    text-align: center !important;
-  }
-  
-  .w-full {
-    width: 100% !important;
-  }
-  
-  .gap-2 {
-    gap: 0.5rem !important;
-  }
-  
-  .space-y-2 > * + * {
-    margin-top: 0.5rem !important;
-  }
-  
-  .space-y-4 > * + * {
-    margin-top: 1rem !important;
-  }
+body {
+  margin: 0;
+  padding: 0;
 }

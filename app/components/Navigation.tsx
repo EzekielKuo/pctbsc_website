@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { signOut } from 'next-auth/react';
 import {
   AppBar,
   Toolbar,
@@ -23,6 +22,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import InstagramIcon from '@mui/icons-material/Instagram';
 import { event } from '@/lib/gtag';
 
 interface NavigationProps {
@@ -84,7 +85,7 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
     setter(target);
   };
 
-  const handleLogout = useCallback(async () => {
+  const handleLogout = useCallback(() => {
     event({ action: 'click', category: 'button', label: '登出' });
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('username');
@@ -94,9 +95,6 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
     setIsAdmin(false);
     setUserLabel('');
     closeAllMenusImmediately();
-    
-    // 清除 OAuth session（如果存在）
-    await signOut({ redirect: false });
     
     router.push('/login');
     router.refresh();
@@ -189,8 +187,35 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
       <List>
         <ListItem><ListItemText primary="關於神研班" /></ListItem>
         <ListItem sx={{ pl: 4 }}>
+          <Link href="/about" onClick={() => { trackNavigationClick('神研班介紹'); handleDrawerToggle(); }} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+            <ListItemText primary="神研班介紹" />
+          </Link>
+        </ListItem>
+        <ListItem sx={{ pl: 4 }}>
           <Link href="/about/timeline" onClick={() => { trackNavigationClick('重要時程'); handleDrawerToggle(); }} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
             <ListItemText primary="重要時程" />
+          </Link>
+        </ListItem>
+        <Divider sx={{ my: 1 }} />
+        <ListItem><ListItemText primary="神研前輩訪談" /></ListItem>
+        <ListItem sx={{ pl: 4 }}>
+          <Link href="/interview" onClick={() => { trackNavigationClick('緣起'); handleDrawerToggle(); }} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+            <ListItemText primary="緣起" />
+          </Link>
+        </ListItem>
+        <ListItem sx={{ pl: 4 }}>
+          <Link href="/interview/chen-nan-zhou" onClick={() => { trackNavigationClick('第1-7屆｜陳南州牧師'); handleDrawerToggle(); }} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+            <ListItemText primary="第1-7屆｜陳南州牧師" />
+          </Link>
+        </ListItem>
+        <ListItem sx={{ pl: 4 }}>
+          <Link href="/interview/huang-chun-sheng" onClick={() => { trackNavigationClick('第20屆後｜黃春生牧師'); handleDrawerToggle(); }} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+            <ListItemText primary="第20屆後｜黃春生牧師" />
+          </Link>
+        </ListItem>
+        <ListItem sx={{ pl: 4 }}>
+          <Link href="/interview/huang-hsu-hui" onClick={() => { trackNavigationClick('第50屆後｜黃敘慧姊妹'); handleDrawerToggle(); }} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+            <ListItemText primary="第50屆後｜黃敘慧姊妹" />
           </Link>
         </ListItem>
       </List>
@@ -228,41 +253,46 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                 slotProps={commonMenuProps}
               >
                 <MenuItem onClick={closeAllMenusImmediately} sx={hoverStyle}>
-                  <Link href="/about/timeline" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>重要時程</Link>
+                  <Link href="/about" onClick={() => trackNavigationClick('神研班介紹')} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>神研班介紹</Link>
                 </MenuItem>
-                <MenuItem 
-                  onMouseEnter={(e) => { clearTimer(); setRelatedSitesAnchor(e.currentTarget); }}
-                  sx={{ justifyContent: 'space-between', ...hoverStyle }}
-                >
-                  神研前輩訪談 <ExpandMoreIcon sx={{ transform: 'rotate(-90deg)', fontSize: '1rem' }} />
+                <MenuItem onClick={closeAllMenusImmediately} sx={hoverStyle}>
+                  <Link href="/about/timeline" onClick={() => trackNavigationClick('重要時程')} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>重要時程</Link>
                 </MenuItem>
               </Menu>
             </Box>
 
-            {/* 子選單：神研前輩訪談 (依照圖片目錄還原) */}
-            <Menu
-              anchorEl={relatedSitesAnchor}
-              open={Boolean(relatedSitesAnchor)}
-              onClose={closeAllMenusImmediately}
-              disableRestoreFocus
-              sx={{ pointerEvents: 'none' }}
-              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-              slotProps={commonMenuProps}
-            >
+            {/* 神研前輩訪談選單 */}
+            <Box onMouseLeave={handleDelayedClose}>
+              <Button
+                onMouseEnter={handleMenuOpen(setRelatedSitesAnchor)}
+                sx={{ textTransform: 'none', color: textColor, fontSize: '1rem', px: 1.5, py: 1, transition: 'color 0.2s ease', '&:hover': { color: '#1976d2' } }}
+              >
+                神研前輩訪談
+              </Button>
+              <Menu
+                anchorEl={relatedSitesAnchor}
+                open={Boolean(relatedSitesAnchor)}
+                onClose={closeAllMenusImmediately}
+                disableRestoreFocus
+                sx={{ pointerEvents: 'none' }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+                slotProps={commonMenuProps}
+              >
                <MenuItem onClick={closeAllMenusImmediately} sx={hoverStyle}>
-                <Link href="/interview" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>緣起</Link>
+                <Link href="/interview" onClick={() => trackNavigationClick('緣起')} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>緣起</Link>
               </MenuItem>
                <MenuItem onClick={closeAllMenusImmediately} sx={hoverStyle}>
-                <Link href="/interview/chen-nan-zhou" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>第1-7屆｜陳南州牧師</Link>
+                <Link href="/interview/chen-nan-zhou" onClick={() => trackNavigationClick('第1-7屆｜陳南州牧師')} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>第1-7屆｜陳南州牧師</Link>
               </MenuItem>
                <MenuItem onClick={closeAllMenusImmediately} sx={hoverStyle}>
-                <Link href="/interview/huang-chun-sheng" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>第20屆後｜黃春生牧師</Link>
+                <Link href="/interview/huang-chun-sheng" onClick={() => trackNavigationClick('第20屆後｜黃春生牧師')} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>第20屆後｜黃春生牧師</Link>
               </MenuItem>
                <MenuItem onClick={closeAllMenusImmediately} sx={hoverStyle}>
-                <Link href="/interview/huang-hsu-hui" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>第50屆後｜黃敘慧姊妹</Link>
+                <Link href="/interview/huang-hsu-hui" onClick={() => trackNavigationClick('第50屆後｜黃敘慧姊妹')} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>第50屆後｜黃敘慧姊妹</Link>
               </MenuItem>
             </Menu>
+            </Box>
 
             {/* 63神研選單 */}
             <Box onMouseLeave={handleDelayedClose}>
@@ -293,31 +323,67 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                 </MenuItem>
               </Menu>
             </Box>
+          </Box>
 
-            {/* 我要報名 */}
-            <Button
-              component={Link}
-              href="/join"
-              onClick={() => trackNavigationClick('我要報名')}
-              variant="outlined"
+          <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
+            {/* Facebook 和 Instagram Icon */}
+            <IconButton
+              component="a"
+              href="https://www.facebook.com/PCTBSC/?locale=zh_TW"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => event({
+                action: 'click',
+                category: 'external_link',
+                label: 'Facebook',
+              })}
+              size="small"
               sx={{
-                textTransform: 'none',
-                color: textColor,
-                borderColor: textColor === 'white' ? 'rgba(255,255,255,0.7)' : '#1976d2',
-                ml: 1,
+                width: 40,
+                height: 40,
+                border: '2px solid',
+                borderColor: 'white',
+                borderRadius: '50%',
+                color: 'white',
                 transition: 'all 0.2s ease',
                 '&:hover': {
-                  color: textColor === 'white' ? '#e3f2fd' : '#1565c0',
-                  borderColor: textColor === 'white' ? '#e3f2fd' : '#1565c0',
-                  backgroundColor: textColor === 'white' ? 'rgba(255,255,255,0.08)' : 'rgba(21, 101, 192, 0.08)',
+                  borderColor: '#1976d2',
+                  color: '#1976d2',
+                  backgroundColor: 'rgba(25, 118, 210, 0.1)',
                 },
               }}
             >
-              我要報名
-            </Button>
-          </Box>
+              <FacebookIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              component="a"
+              href="https://www.instagram.com/pctbsc63/"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => event({
+                action: 'click',
+                category: 'external_link',
+                label: 'Instagram',
+              })}
+              size="small"
+              sx={{
+                width: 40,
+                height: 40,
+                border: '2px solid',
+                borderColor: 'white',
+                borderRadius: '50%',
+                color: 'white',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  borderColor: '#1976d2',
+                  color: '#1976d2',
+                  backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                },
+              }}
+            >
+              <InstagramIcon fontSize="small" />
+            </IconButton>
 
-          <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 0.5 }}>
             {isLoggedIn && (
               <Typography variant="caption" sx={{ fontWeight: 700, color: '#1976d2' }}>
                 {userLabel || (isAdmin ? 'admin' : 'user')}

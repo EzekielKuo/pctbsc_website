@@ -707,195 +707,195 @@ export default function EditPage() {
 
           {keyVisualPage === 'home' ? (
             <>
-              <Paper sx={{ p: 3, mb: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                  <Typography variant="h6">
-                    輪播圖片
-                  </Typography>
-                  <Button
-                    variant="text"
-                    startIcon={<Plus />}
-                    onClick={handleAddImage}
-                    sx={{
-                      textTransform: 'none',
-                    }}
-                  >
-                    新增圖片
-                  </Button>
-                </Box>
+          <Paper sx={{ p: 3, mb: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Typography variant="h6">
+                輪播圖片
+              </Typography>
+              <Button
+                variant="text"
+                startIcon={<Plus />}
+                onClick={handleAddImage}
+                sx={{
+                  textTransform: 'none',
+                }}
+              >
+                新增圖片
+              </Button>
+            </Box>
 
-                {images.length === 0 ? (
-                  <Typography variant="body1" color="text.secondary" align="center" sx={{ py: 4 }}>
-                    目前尚無圖片，點擊「新增圖片」開始添加
-                  </Typography>
-                ) : (
-                  <Grid container spacing={2}>
-                    {images.map((image, index) => (
-                      <Grid size={{ xs: 12, sm: 6, md: 4 }} key={image.id || index}>
-                        <Card
-                          sx={{
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                          }}
+            {images.length === 0 ? (
+              <Typography variant="body1" color="text.secondary" align="center" sx={{ py: 4 }}>
+                目前尚無圖片，點擊「新增圖片」開始添加
+              </Typography>
+            ) : (
+              <Grid container spacing={2}>
+                {images.map((image, index) => (
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }} key={image.id || index}>
+                    <Card
+                      sx={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                    >
+                    <Box sx={{ position: 'relative' }}>
+                      <CardMedia
+                        component="img"
+                        image={image.url}
+                        alt={`照片 ${index + 1}`}
+                        sx={{
+                          aspectRatio: '16/9',
+                          objectFit: 'cover',
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: 8,
+                          left: 8,
+                          bgcolor: 'rgba(0, 0, 0, 0.6)',
+                          color: 'white',
+                          px: 1.5,
+                          py: 0.5,
+                          borderRadius: 1,
+                          fontSize: '0.875rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        照片 {index + 1}
+                      </Box>
+                    </Box>
+                    <CardActions sx={{ justifyContent: 'space-between', px: 2, py: 1.5 }}>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleMoveLeft(index)}
+                          disabled={index === 0}
+                          aria-label="向左移動"
                         >
-                          <Box sx={{ position: 'relative' }}>
-                            <CardMedia
-                              component="img"
-                              image={image.url}
-                              alt={`照片 ${index + 1}`}
-                              sx={{
-                                aspectRatio: '16/9',
-                                objectFit: 'cover',
-                              }}
-                            />
-                            <Box
-                              sx={{
-                                position: 'absolute',
-                                top: 8,
-                                left: 8,
-                                bgcolor: 'rgba(0, 0, 0, 0.6)',
-                                color: 'white',
-                                px: 1.5,
-                                py: 0.5,
-                                borderRadius: 1,
-                                fontSize: '0.875rem',
-                                fontWeight: 600,
-                              }}
-                            >
-                              照片 {index + 1}
-                            </Box>
-                          </Box>
-                          <CardActions sx={{ justifyContent: 'space-between', px: 2, py: 1.5 }}>
-                            <Stack direction="row" spacing={1} alignItems="center">
-                              <IconButton
-                                size="small"
-                                onClick={() => handleMoveLeft(index)}
-                                disabled={index === 0}
-                                aria-label="向左移動"
-                              >
-                                <ArrowLeft />
-                              </IconButton>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleMoveRight(index)}
-                                disabled={index === images.length - 1}
-                                aria-label="向右移動"
-                              >
-                                <ArrowRight />
-                              </IconButton>
-                            </Stack>
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={() => image.id && handleDeleteImage(image.id)}
-                              aria-label="刪除"
-                            >
-                              <Trash2 />
-                            </IconButton>
-                          </CardActions>
-                        </Card>
-                      </Grid>
-                    ))}
+                          <ArrowLeft />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleMoveRight(index)}
+                          disabled={index === images.length - 1}
+                          aria-label="向右移動"
+                        >
+                          <ArrowRight />
+                        </IconButton>
+                      </Stack>
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => image.id && handleDeleteImage(image.id)}
+                        aria-label="刪除"
+                      >
+                        <Trash2 />
+                      </IconButton>
+                    </CardActions>
+                    </Card>
                   </Grid>
-                )}
-              </Paper>
+                ))}
+              </Grid>
+            )}
+          </Paper>
 
-              {/* Instagram 貼文管理 */}
-              <Paper sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                  <Typography variant="h6">
-                    Instagram 貼文管理
-                  </Typography>
-                  <Button
-                    variant="outlined"
-                    startIcon={<Plus />}
-                    onClick={handleAddInstagramPost}
-                    sx={{
-                      borderWidth: 2,
-                      '&:hover': { borderWidth: 2 },
-                    }}
-                  >
-                    新增貼文
-                  </Button>
-                </Box>
+          {/* Instagram 貼文管理 */}
+          <Paper sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Typography variant="h6">
+                Instagram 貼文管理
+              </Typography>
+              <Button
+                variant="outlined"
+                startIcon={<Plus />}
+                onClick={handleAddInstagramPost}
+                sx={{
+                  borderWidth: 2,
+                  '&:hover': { borderWidth: 2 },
+                }}
+              >
+                新增貼文
+              </Button>
+            </Box>
 
-                {instagramPosts.length === 0 ? (
-                  <Typography variant="body1" color="text.secondary" align="center" sx={{ py: 4 }}>
-                    目前尚無 Instagram 貼文，點擊「新增貼文」開始添加
-                  </Typography>
-                ) : (
-                  <Grid container spacing={2}>
-                    {instagramPosts.map((post, index) => (
+            {instagramPosts.length === 0 ? (
+              <Typography variant="body1" color="text.secondary" align="center" sx={{ py: 4 }}>
+                目前尚無 Instagram 貼文，點擊「新增貼文」開始添加
+              </Typography>
+            ) : (
+              <Grid container spacing={2}>
+                {instagramPosts.map((post, index) => (
                       <Grid size={{ xs: 12, sm: 3, md: 3 }} key={post.id || index}>
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            pl: 3,
-                            pr: 0.5,
-                            py: 2,
-                            border: '1px solid',
-                            borderColor: 'divider',
-                            borderRadius: 1,
-                            bgcolor: 'background.paper',
-                            minHeight: 60,
-                            width: '100%',
-                            '&:hover': {
-                              bgcolor: 'action.hover',
-                            },
-                          }}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        pl: 3,
+                        pr: 0.5,
+                        py: 2,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: 1,
+                        bgcolor: 'background.paper',
+                        minHeight: 60,
+                        width: '100%',
+                        '&:hover': {
+                          bgcolor: 'action.hover',
+                        },
+                      }}
+                    >
+                      <Typography 
+                        variant="body1" 
+                        sx={{ 
+                          flex: '1 1 auto',
+                          minWidth: 0,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          mr: 1,
+                        }}
+                      >
+                        {post.name || `貼文 ${index + 1}`}
+                      </Typography>
+                      <Box sx={{ flexShrink: 0 }}>
+                        <Stack direction="row" spacing={0.5}>
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          onClick={() => handleEditInstagramPost(post)}
+                          aria-label="編輯"
+                          disableRipple
+                          disableFocusRipple
                         >
-                          <Typography 
-                            variant="body1" 
-                            sx={{ 
-                              flex: '1 1 auto',
-                              minWidth: 0,
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                              mr: 1,
-                            }}
-                          >
-                            {post.name || `貼文 ${index + 1}`}
-                          </Typography>
-                          <Box sx={{ flexShrink: 0 }}>
-                            <Stack direction="row" spacing={0.5}>
-                              <IconButton
-                                size="small"
-                                color="primary"
-                                onClick={() => handleEditInstagramPost(post)}
-                                aria-label="編輯"
-                                disableRipple
-                                disableFocusRipple
-                              >
-                                <Edit />
-                              </IconButton>
-                              <IconButton
-                                size="small"
-                                color="error"
-                                onClick={() => post.id && handleDeleteInstagramPost(post.id)}
-                                aria-label="刪除"
-                                disableRipple
-                                disableFocusRipple
-                              >
-                                <Trash2 />
-                              </IconButton>
-                            </Stack>
-                          </Box>
-                        </Box>
-                      </Grid>
-                    ))}
+                            <Edit />
+                          </IconButton>
+                          <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => post.id && handleDeleteInstagramPost(post.id)}
+                          aria-label="刪除"
+                          disableRipple
+                          disableFocusRipple
+                        >
+                            <Trash2 />
+                          </IconButton>
+                        </Stack>
+                      </Box>
+                    </Box>
                   </Grid>
-                )}
-              </Paper>
+                ))}
+              </Grid>
+            )}
+          </Paper>
             </>
           ) : (
             <>
               <Grid container columnSpacing={2} rowSpacing={5} sx={{ mb: 4 }}>
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <Paper sx={{ p: 3, height: '100%' }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                  <Paper sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                       <Typography variant="h6">
                         主視覺圖片
                       </Typography>
@@ -956,8 +956,8 @@ export default function EditPage() {
                   </Paper>
                 </Grid>
 
-                <Grid size={{ xs: 12, md: 6 }} sx={{ mt: { xs: 6, md: 7 } }}>
-                  <Paper sx={{ p: 3, height: '100%' }}>
+                <Grid size={{ xs: 12, md: 6 }} sx={{ mt: { xs: 6, md: 0 } }}>
+                  <Paper sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                       <Typography variant="h6">
                         活動日程表
@@ -979,13 +979,12 @@ export default function EditPage() {
                         alt="活動日程表"
                         onClick={() => handleOpenPreview(schedule.url, '活動日程表')}
                         sx={{
-                          width: '95%',
+                          width: '100%',
                           height: 260,
                           objectFit: 'cover',
                           borderRadius: 2,
                           boxShadow: 2,
                           cursor: 'pointer',
-                          mx: 'auto',
                         }}
                       />
                     ) : (

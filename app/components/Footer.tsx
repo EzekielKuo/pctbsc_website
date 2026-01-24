@@ -1,9 +1,7 @@
 'use client';
 
-import { Box, Container, Grid, Typography, Link as MuiLink, Divider, IconButton } from '@mui/material';
+import { Box, Container, Grid, Typography, Link as MuiLink, Divider } from '@mui/material';
 import Link from 'next/link';
-import FacebookIcon from '@mui/icons-material/Facebook';
-import InstagramIcon from '@mui/icons-material/Instagram';
 import packageJson from '@/package.json';
 import { event } from '@/lib/gtag';
 
@@ -49,52 +47,6 @@ export default function Footer({ contactInfo, links }: FooterProps) {
                   </MuiLink>
                 </Box>
               ))}
-            </Box>
-            <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-              <IconButton
-                component="a"
-                href="https://www.facebook.com/PCTBSC/?locale=zh_TW"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => event({
-                  action: 'click',
-                  category: 'external_link',
-                  label: 'Facebook',
-                })}
-                size="small"
-                sx={{
-                  width: 40,
-                  height: 40,
-                  border: '2px solid',
-                  borderColor: 'grey.300',
-                  borderRadius: '50%',
-                  color: 'grey.300',
-                }}
-              >
-                <FacebookIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                component="a"
-                href="https://www.instagram.com/pctbsc63/"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => event({
-                  action: 'click',
-                  category: 'external_link',
-                  label: 'Instagram',
-                })}
-                size="small"
-                sx={{
-                  width: 40,
-                  height: 40,
-                  border: '2px solid',
-                  borderColor: 'grey.300',
-                  borderRadius: '50%',
-                  color: 'grey.300',
-                }}
-              >
-                <InstagramIcon fontSize="small" />
-              </IconButton>
             </Box>
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>

@@ -13,7 +13,7 @@ const theme = createTheme({
       main: '#dc004e',
     },
     background: {
-      default: '#f5f5f5',
+      default: '#000000',
       paper: '#ffffff',
     },
   },
@@ -63,6 +63,9 @@ const theme = createTheme({
 });
 
 export default theme;
+
+
+
 
 
 
