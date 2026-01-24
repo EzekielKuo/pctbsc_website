@@ -5,7 +5,7 @@ test.describe('首頁基本功能測試', () => {
     await page.goto('/');
     
     // 檢查頁面標題
-    await expect(page).toHaveTitle(/神研班/);
+    await expect(page).toHaveTitle(/大專聖經神學研究班/);
     
     // 檢查主要元素是否存在
     await expect(page.locator('text=63rd神研班').first()).toBeVisible();
