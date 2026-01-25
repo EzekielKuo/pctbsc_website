@@ -24,32 +24,47 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { doorIndex, url } = body;
 
-    if (typeof doorIndex !== 'number' || doorIndex < 0 || doorIndex > 5) {
+    // 驗證 doorIndex
+    if (doorIndex === undefined || doorIndex === null) {
+      console.error('缺少 doorIndex 參數:', body);
       return NextResponse.json(
-        { success: false, error: '门索引必须在 0-5 之间' },
+        { success: false, error: '缺少必要參數：doorIndex' },
         { status: 400 }
       );
     }
 
-    if (!url || typeof url !== 'string') {
+    // 確保 doorIndex 是數字
+    const doorIndexNum = typeof doorIndex === 'string' ? parseInt(doorIndex, 10) : doorIndex;
+    
+    if (isNaN(doorIndexNum) || doorIndexNum < 0 || doorIndexNum > 5) {
+      console.error('無效的 doorIndex:', doorIndex, '類型:', typeof doorIndex);
       return NextResponse.json(
-        { success: false, error: '链接不能为空' },
+        { success: false, error: '門索引必須在 0-5 之間' },
+        { status: 400 }
+      );
+    }
+
+    // 驗證 url
+    if (!url || typeof url !== 'string' || !url.trim()) {
+      console.error('無效的 url:', url, '類型:', typeof url);
+      return NextResponse.json(
+        { success: false, error: '連結不能為空' },
         { status: 400 }
       );
     }
 
     // 使用 upsert 来更新或创建
     const link = await prisma.questionnaireLink.upsert({
-      where: { doorIndex },
-      update: { url },
-      create: { doorIndex, url }
+      where: { doorIndex: doorIndexNum },
+      update: { url: url.trim() },
+      create: { doorIndex: doorIndexNum, url: url.trim() }
     });
 
     return NextResponse.json({ success: true, data: link });
   } catch (error) {
-    console.error('更新问卷链接错误:', error);
+    console.error('更新問卷連結錯誤:', error);
     return NextResponse.json(
-      { success: false, error: '更新问卷链接失败' },
+      { success: false, error: '更新問卷連結失敗' },
       { status: 500 }
     );
   }

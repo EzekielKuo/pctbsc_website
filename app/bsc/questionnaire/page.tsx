@@ -106,8 +106,8 @@ export default function QuestionnairePage() {
     },
   ];
 
-  // 渲染單個門
-  const renderDoor = (doorIndex: number) => {
+  // 渲染單個門（含門下方 Day N 標籤）
+  const renderDoor = (doorIndex: number, dayNumber: number) => {
     const isOpen = doorStates[doorIndex];
     const link = questionnaireLinks.find((l) => l.doorIndex === doorIndex);
     const hasLink = link && link.url;
@@ -118,9 +118,8 @@ export default function QuestionnairePage() {
       <DoorClosed size={120} strokeWidth={1.5} color="white" />
     );
 
-    // 如果門是開的且有連結，就可以點擊
-    if (isOpen && hasLink) {
-      return (
+    const iconBlock =
+      isOpen && hasLink ? (
         <Box
           component="a"
           href={link.url}
@@ -129,23 +128,23 @@ export default function QuestionnairePage() {
           sx={{
             textAlign: 'center',
             cursor: 'pointer',
-            transition: 'transform 0.2s, opacity 0.2s',
             display: 'inline-block',
-            '&:hover': {
-              transform: 'scale(1.1)',
-              opacity: 0.8,
-            },
           }}
         >
           {doorIcon}
         </Box>
+      ) : (
+        <Box sx={{ textAlign: 'center' }}>
+          {doorIcon}
+        </Box>
       );
-    }
 
-    // 否則只是顯示門的圖示
     return (
-      <Box sx={{ textAlign: 'center', opacity: isOpen ? 1 : 0.5 }}>
-        {doorIcon}
+      <Box sx={{ textAlign: 'center' }}>
+        {iconBlock}
+        <Typography sx={{ mt: 1.5, color: 'white', fontSize: '1rem' }}>
+          Day {dayNumber}
+        </Typography>
       </Box>
     );
   };
@@ -178,11 +177,11 @@ export default function QuestionnairePage() {
               flexWrap: 'wrap'
             }}>
               {/* 左上 */}
-              {renderDoor(0)}
+              {renderDoor(0, 1)}
               {/* 中上 */}
-              {renderDoor(1)}
+              {renderDoor(1, 2)}
               {/* 右上 */}
-              {renderDoor(2)}
+              {renderDoor(2, 3)}
             </Box>
 
             {/* 下排三個門 */}
@@ -193,11 +192,11 @@ export default function QuestionnairePage() {
               flexWrap: 'wrap'
             }}>
               {/* 左下 */}
-              {renderDoor(3)}
+              {renderDoor(3, 4)}
               {/* 中下 */}
-              {renderDoor(4)}
+              {renderDoor(4, 5)}
               {/* 右下 */}
-              {renderDoor(5)}
+              {renderDoor(5, 6)}
             </Box>
           </Paper>
         </Container>

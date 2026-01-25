@@ -33,7 +33,6 @@ interface NavigationProps {
 export default function Navigation({ currentPage = 'home' }: NavigationProps) {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [aboutAnchor, setAboutAnchor] = useState<null | HTMLElement>(null);
   const [relatedSitesAnchor, setRelatedSitesAnchor] = useState<null | HTMLElement>(null);
   const [camp63Anchor, setCamp63Anchor] = useState<null | HTMLElement>(null);
   const [infoAnchor, setInfoAnchor] = useState<null | HTMLElement>(null);
@@ -60,7 +59,6 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
   // 強制關閉所有選單狀態
   const closeAllMenusImmediately = useCallback(() => {
     clearTimer();
-    setAboutAnchor(null);
     setRelatedSitesAnchor(null);
     setCamp63Anchor(null);
     setInfoAnchor(null);
@@ -70,7 +68,6 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
   const handleDelayedClose = useCallback(() => {
     clearTimer();
     timeoutRef.current = setTimeout(() => {
-      setAboutAnchor(null);
       setRelatedSitesAnchor(null);
       setCamp63Anchor(null);
       setInfoAnchor(null);
@@ -187,18 +184,6 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
       </Box>
       <Divider />
       <List>
-        <ListItem><ListItemText primary="關於神研班" /></ListItem>
-        <ListItem sx={{ pl: 4 }}>
-          <Link href="/about" onClick={() => { trackNavigationClick('神研班介紹'); handleDrawerToggle(); }} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
-            <ListItemText primary="神研班介紹" />
-          </Link>
-        </ListItem>
-        <ListItem sx={{ pl: 4 }}>
-          <Link href="/about/timeline" onClick={() => { trackNavigationClick('重要時程'); handleDrawerToggle(); }} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
-            <ListItemText primary="重要時程" />
-          </Link>
-        </ListItem>
-        <Divider sx={{ my: 1 }} />
         <ListItem><ListItemText primary="63神研" /></ListItem>
         <ListItem sx={{ pl: 4 }}>
           <Link href="/bsc/theme" onClick={() => { trackNavigationClick('神研班主題'); handleDrawerToggle(); }} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
@@ -258,33 +243,6 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
 
           <Box sx={{ display: 'none', '@media (min-width: 800px)': { display: 'flex' }, gap: 0.5, alignItems: 'center' }}>
             
-            {/* 關於神研班選單 */}
-            <Box onMouseLeave={handleDelayedClose}>
-              <Button
-                onMouseEnter={handleMenuOpen(setAboutAnchor)}
-                sx={{ textTransform: 'none', color: textColor, fontSize: '1rem', px: 1.5, py: 1, transition: 'color 0.2s ease', '&:hover': { color: '#1976d2' } }}
-              >
-                關於神研班
-              </Button>
-              <Menu
-                anchorEl={aboutAnchor}
-                open={Boolean(aboutAnchor)}
-                onClose={closeAllMenusImmediately}
-                disableRestoreFocus
-                sx={{ pointerEvents: 'none' }}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'center' }}
-                slotProps={commonMenuProps}
-              >
-                <MenuItem onClick={closeAllMenusImmediately} sx={hoverStyle}>
-                  <Link href="/about" onClick={() => trackNavigationClick('神研班介紹')} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>神研班介紹</Link>
-                </MenuItem>
-                <MenuItem onClick={closeAllMenusImmediately} sx={hoverStyle}>
-                  <Link href="/about/timeline" onClick={() => trackNavigationClick('重要時程')} style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>重要時程</Link>
-                </MenuItem>
-              </Menu>
-            </Box>
-
             {/* 63神研選單 */}
             <Box onMouseLeave={handleDelayedClose}>
               <Button 
@@ -435,25 +393,7 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
                   <MenuItem onClick={handleLogout} sx={hoverStyle}>登出</MenuItem>
                 </Menu>
               </Box>
-            ) : (
-              <Button 
-                component={Link} 
-                href="/login" 
-                onClick={() => trackNavigationClick('登入')}
-                variant="text" 
-                sx={{ 
-                  textTransform: 'none', 
-                  color: '#1976d2',
-                  transition: 'all 0.2s ease',
-                  '&:hover': { 
-                    color: '#1565c0', 
-                    backgroundColor: 'rgba(21, 101, 192, 0.08)' 
-                  } 
-                }}
-              >
-                Login
-              </Button>
-            )}
+            ) : null}
           </Box>
         </Toolbar>
       </AppBar>

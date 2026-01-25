@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Box, Container, Grid, Typography, Link as MuiLink, Divider } from '@mui/material';
 import packageJson from '@/package.json';
 import { event } from '@/lib/gtag';
@@ -75,6 +76,27 @@ export default function Footer({ contactInfo, links }: FooterProps) {
                 </MuiLink>
               </Box>
             </Box>
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <MuiLink
+              component={Link}
+              href="/login"
+              onClick={() => event({
+                action: 'click',
+                category: 'navigation',
+                label: 'Login',
+              })}
+              sx={{
+                textDecoration: 'none',
+                color: '#1976d2',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                display: 'inline-block',
+                '&:hover': { color: '#1565c0' },
+              }}
+            >
+              Login
+            </MuiLink>
           </Grid>
         </Grid>
         <Divider sx={{ borderColor: 'grey.700', mb: 4 }} />
