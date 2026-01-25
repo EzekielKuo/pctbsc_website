@@ -26,7 +26,38 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: '63神研班-2026大專聖經神學研究班',
-  description: '63神研班-2026大專聖經神學研究班營會網站，提供報名資訊、營會介紹、FAQ等相關資訊',
+  description: '歡迎來到 63 神研班！，提供活動簡介、前輩訪談及報名資訊。透過閱讀聖經與全台大專青年一同成長。',
+  keywords: [
+    '神研班', 
+    '大專聖經神學研究班', 
+    'PCT', 
+    '台灣基督長老教會',
+    '第 63 屆神研班報名',
+    '神研班訪談',
+    '聖經研究營隊',
+    '長老教會大專生活動',
+    '台灣基督長老教會營隊'
+  ],
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
+  openGraph: {
+    title: '63神研班-2026大專聖經神學研究班',
+    description: '歡迎來到 63 神研班！，提供活動簡介、前輩訪談及報名資訊。透過閱讀聖經與全台大專青年一同成長。',
+    url: 'https://pctbsc-website.vercel.app/',
+    siteName: '神研班官網',
+    images: [
+      {
+        url: 'https://pctbsc-website.vercel.app/logo.png',
+        width: 512,
+        height: 512,
+        alt: '63神研班 Logo - 台灣基督長老教會',
+      },
+    ],
+    locale: 'zh_TW',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({
