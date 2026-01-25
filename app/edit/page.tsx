@@ -75,14 +75,13 @@ export default function EditPage() {
   const [deleteKeyVisualConfirmOpen, setDeleteKeyVisualConfirmOpen] = useState(false);
   const [deleteScheduleConfirmOpen, setDeleteScheduleConfirmOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null);
-  const [bibleTopicName, setBibleTopicName] = useState('');
-  const [bibleTopicIntro, setBibleTopicIntro] = useState('');
-  const [bibleActivityInfo, setBibleActivityInfo] = useState('');
-  const [bibleSignupInfo, setBibleSignupInfo] = useState('');
   const [aboutBSCContent, setAboutBSCContent] = useState('');
   const [aboutBSCInitialLoad, setAboutBSCInitialLoad] = useState(true);
   const [aboutBSCSaving, setAboutBSCSaving] = useState(false);
   const [aboutBSCSaved, setAboutBSCSaved] = useState(false);
+  const [questionnaireInitialLoad, setQuestionnaireInitialLoad] = useState(true);
+  const [questionnaireSaving, setQuestionnaireSaving] = useState(false);
+  const [questionnaireSaved, setQuestionnaireSaved] = useState(false);
 
   // 處理 Dialog 打開/關閉時的滾動控制
   useEffect(() => {
@@ -154,16 +153,18 @@ export default function EditPage() {
       const response = await fetch('/api/questionnaire');
       const result = await response.json();
       if (result.success) {
-        // 确保所有6个门都有对应的链接对象
+        // 確保所有6個門都有對應的連結對象
         const links: QuestionnaireLink[] = [];
         for (let i = 0; i < 6; i++) {
           const existingLink = result.data.find((l: QuestionnaireLink) => l.doorIndex === i);
           links.push(existingLink || { doorIndex: i, url: '' });
         }
         setQuestionnaireLinks(links);
+        setQuestionnaireInitialLoad(false);
       }
     } catch (err) {
-      console.error('获取问卷链接错误:', err);
+      console.error('獲取問卷連結錯誤:', err);
+      setQuestionnaireInitialLoad(false);
     }
   };
 
@@ -238,18 +239,23 @@ export default function EditPage() {
   };
 
   const handleUpdateQuestionnaireLink = async (doorIndex: number, url: string) => {
+    // 如果 URL 為空，不發送請求
+    if (!url || !url.trim()) {
+      return;
+    }
+
     try {
       const response = await fetch('/api/questionnaire', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ doorIndex, url }),
+        body: JSON.stringify({ doorIndex, url: url.trim() }),
       });
 
       const result = await response.json();
       if (result.success) {
-        // 更新本地状态
+        // 更新本地狀態
         const newLinks = [...questionnaireLinks];
-        newLinks[doorIndex] = { doorIndex, url };
+        newLinks[doorIndex] = { doorIndex, url: url.trim() };
         setQuestionnaireLinks(newLinks);
         setSuccess('問卷連結已更新！');
         setTimeout(() => setSuccess(''), 3000);
@@ -291,6 +297,44 @@ export default function EditPage() {
 
     return () => clearTimeout(timer);
   }, [aboutBSCContent, aboutBSCInitialLoad]);
+
+  // 自動儲存每日問卷連結設定
+  useEffect(() => {
+    // 跳過初始載入
+    if (questionnaireInitialLoad) return;
+
+    // 立即顯示「儲存中...」
+    setQuestionnaireSaving(true);
+    setQuestionnaireSaved(false);
+
+    // 使用 debounce 延遲保存（1秒後保存）
+    const timer = setTimeout(async () => {
+      try {
+        // 儲存所有有 URL 的連結
+        const linksToSave = questionnaireLinks.filter(link => link && link.url && link.url.trim());
+        
+        if (linksToSave.length > 0) {
+          const savePromises = linksToSave.map(link => 
+            fetch('/api/questionnaire', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ doorIndex: link.doorIndex, url: link.url.trim() }),
+            })
+          );
+          await Promise.all(savePromises);
+        }
+        
+        // 無論是否有連結需要儲存，都顯示儲存完成
+        setQuestionnaireSaving(false);
+        setQuestionnaireSaved(true);
+      } catch (err) {
+        console.error('自動保存每日問卷連結錯誤:', err);
+        setQuestionnaireSaving(false);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [questionnaireLinks, questionnaireInitialLoad]);
 
   const handleSaveAboutBSC = async () => {
     try {
@@ -706,6 +750,7 @@ export default function EditPage() {
       setError('請輸入 Instagram 貼文 URL');
       return;
     }
+    if (deleting) return; // 防止雙重送交
 
     try {
       setLoadingMessage('儲存中...');
@@ -729,14 +774,17 @@ export default function EditPage() {
           setError(result.error || '更新貼文失敗');
         }
       } else {
-        // 新增貼文
+        // 新增貼文：使用「目前最大 order + 1」，讓新貼文一律出現在最後
+        const maxOrder = instagramPosts.length === 0
+          ? 0
+          : Math.max(...instagramPosts.map((p) => p.order ?? 0)) + 1;
         const response = await fetch('/api/instagram', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             url: instagramUrl, 
             name: instagramName,
-            order: instagramPosts.length 
+            order: maxOrder,
           }),
         });
         const result = await response.json();
@@ -770,7 +818,7 @@ export default function EditPage() {
       const response = await fetch(`/api/instagram?id=${id}`, { method: 'DELETE' });
       const result = await response.json();
       if (result.success) {
-        setInstagramPosts(instagramPosts.filter((post) => post.id !== id));
+        await fetchInstagramPosts();
       } else {
         setError(result.error || '刪除貼文失敗');
       }
@@ -983,6 +1031,8 @@ export default function EditPage() {
                 variant="text"
                 startIcon={<Plus />}
                 onClick={handleAddInstagramPost}
+                disableRipple
+                disableFocusRipple
               >
                 新增貼文
               </Button>
@@ -1220,177 +1270,40 @@ export default function EditPage() {
                   </Paper>
                 </Grid>
               </Grid>
-
-              <Stack spacing={3}>
-                <Paper sx={{ p: 3 }}>
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    主題名稱
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    placeholder="請輸入主題名稱"
-                    value={bibleTopicName}
-                    onChange={(e) => setBibleTopicName(e.target.value)}
-                  />
-                </Paper>
-
-                <Paper sx={{ p: 3 }}>
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    主題介紹
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    multiline
-                    minRows={3}
-                    placeholder="請輸入主題介紹"
-                    value={bibleTopicIntro}
-                    onChange={(e) => setBibleTopicIntro(e.target.value)}
-                  />
-                </Paper>
-
-                <Paper sx={{ p: 3 }}>
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    活動資訊
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    multiline
-                    minRows={3}
-                    placeholder="請輸入活動資訊"
-                    value={bibleActivityInfo}
-                    onChange={(e) => setBibleActivityInfo(e.target.value)}
-                  />
-                </Paper>
-
-                <Paper sx={{ p: 3 }}>
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    報名資訊
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    multiline
-                    minRows={3}
-                    placeholder="請輸入報名資訊"
-                    value={bibleSignupInfo}
-                    onChange={(e) => setBibleSignupInfo(e.target.value)}
-                  />
-                </Paper>
-
-                <Paper sx={{ p: 3 }}>
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    神研班主題
-                  </Typography>
-                  <Box
-                    sx={{
-                      minHeight: 120,
-                      border: '2px dashed rgba(0,0,0,0.2)',
-                      borderRadius: 2,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'rgba(0,0,0,0.65)',
-                      bgcolor: 'background.paper',
-                      px: 2,
-                      textAlign: 'center',
-                    }}
-                  >
-                    <Typography variant="body1">
-                      {bibleTopicName || '尚未輸入主題名稱'}
-                    </Typography>
-                  </Box>
-                </Paper>
-
-                <Paper sx={{ p: 3 }}>
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    主題介紹
-                  </Typography>
-                  <Box
-                    sx={{
-                      minHeight: 120,
-                      border: '2px dashed rgba(0,0,0,0.2)',
-                      borderRadius: 2,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'rgba(0,0,0,0.65)',
-                      bgcolor: 'background.paper',
-                      px: 2,
-                      textAlign: 'center',
-                    }}
-                  >
-                    <Typography variant="body1">
-                      {bibleTopicIntro || '尚未輸入主題介紹'}
-                    </Typography>
-                  </Box>
-                </Paper>
-
-                <Paper sx={{ p: 3 }}>
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    活動資訊
-                  </Typography>
-                  <Box
-                    sx={{
-                      minHeight: 120,
-                      border: '2px dashed rgba(0,0,0,0.2)',
-                      borderRadius: 2,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'rgba(0,0,0,0.65)',
-                      bgcolor: 'background.paper',
-                      px: 2,
-                      textAlign: 'center',
-                    }}
-                  >
-                    <Typography variant="body1">
-                      {bibleActivityInfo || '尚未輸入活動資訊'}
-                    </Typography>
-                  </Box>
-                </Paper>
-
-                <Paper sx={{ p: 3 }}>
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    報名資訊
-                  </Typography>
-                  <Box
-                    sx={{
-                      minHeight: 120,
-                      border: '2px dashed rgba(0,0,0,0.2)',
-                      borderRadius: 2,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'rgba(0,0,0,0.65)',
-                      bgcolor: 'background.paper',
-                      px: 2,
-                      textAlign: 'center',
-                    }}
-                  >
-                    <Typography variant="body1">
-                      {bibleSignupInfo || '尚未輸入報名資訊'}
-                    </Typography>
-                  </Box>
-                </Paper>
-              </Stack>
             </>
           ) : (
             <>
               <Paper sx={{ p: 3, mb: 3 }}>
-                <Typography variant="h6" sx={{ mb: 3 }}>
-                  每日問卷連結設定
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-                  為每個門設定對應的問卷連結。只有在開門時間內，該連結才能被點擊。
-                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                  <Typography variant="h6">
+                    每日問卷連結設定
+                  </Typography>
+                  <Typography 
+                    sx={{ 
+                      color: questionnaireSaving ? 'primary.main' : questionnaireSaved ? 'success.main' : 'text.disabled',
+                      fontWeight: 700,
+                      fontSize: '0.875rem',
+                      letterSpacing: '0.02857em',
+                      textTransform: 'uppercase',
+                      minWidth: 100,
+                      textAlign: 'center',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {questionnaireSaving ? '儲存中...' : questionnaireSaved ? '儲存完成' : ''}
+                  </Typography>
+                </Box>
 
                 <Stack spacing={3}>
                   {[
-                    { index: 0, label: '左上門 (1/26 17:00 - 1/27 17:00)' },
-                    { index: 1, label: '中上門 (1/27 17:00 - 1/28 17:00)' },
-                    { index: 2, label: '右上門 (1/28 17:00 - 1/29 17:00)' },
-                    { index: 3, label: '左下門 (1/29 17:00 - 1/30 17:00)' },
-                    { index: 4, label: '中下門 (1/30 17:00 - 1/31 11:00)' },
-                    { index: 5, label: '右下門 (1/31 11:00 - 1/31 23:59)' },
+                    { index: 0, label: '左上門' },
+                    { index: 1, label: '中上門' },
+                    { index: 2, label: '右上門' },
+                    { index: 3, label: '左下門' },
+                    { index: 4, label: '中下門' },
+                    { index: 5, label: '右下門' },
                   ].map((door) => (
                     <Box key={door.index}>
                       <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
@@ -1398,24 +1311,12 @@ export default function EditPage() {
                       </Typography>
                       <TextField
                         fullWidth
-                        placeholder="請輸入問卷連結（例如：https://forms.gle/...）"
+                        placeholder="請輸入問卷連結"
                         value={questionnaireLinks[door.index]?.url || ''}
                         onChange={(e) => {
                           const newLinks = [...questionnaireLinks];
                           newLinks[door.index] = { doorIndex: door.index, url: e.target.value };
                           setQuestionnaireLinks(newLinks);
-                        }}
-                        onBlur={() => {
-                          // 當失去焦點時保存
-                          if (questionnaireLinks[door.index]) {
-                            handleUpdateQuestionnaireLink(door.index, questionnaireLinks[door.index].url);
-                          }
-                        }}
-                        onKeyDown={(e) => {
-                          // Enter 鍵也觸發保存
-                          if (e.key === 'Enter' && questionnaireLinks[door.index]) {
-                            handleUpdateQuestionnaireLink(door.index, questionnaireLinks[door.index].url);
-                          }
                         }}
                         size="small"
                       />
@@ -1703,12 +1604,6 @@ export default function EditPage() {
         onClose={() => setInstagramDialogOpen(false)} 
         maxWidth="sm" 
         fullWidth
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && instagramUrl.trim() && !e.shiftKey) {
-            e.preventDefault();
-            handleSaveInstagramPost();
-          }
-        }}
       >
         <DialogTitle>
           {editingPost ? '編輯 Instagram 貼文' : '新增 Instagram 貼文'}
@@ -1750,7 +1645,7 @@ export default function EditPage() {
           <Button
             onClick={handleSaveInstagramPost}
             variant="contained"
-            disabled={!instagramUrl.trim()}
+            disabled={!instagramUrl.trim() || deleting}
           >
             {editingPost ? '儲存' : '新增'}
           </Button>

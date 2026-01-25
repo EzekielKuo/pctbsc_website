@@ -292,14 +292,9 @@ export default function Promotion({ title = '宣傳組資訊' }: PromotionProps)
                     data-post
                     sx={{
                       flex: '0 0 auto',
-                      width: '360px',
+                      width: 320,
+                      minWidth: 320,
                       position: 'relative',
-                      '@media (max-width: 960px)': {
-                        width: '280px',
-                      },
-                      '@media (max-width: 600px)': {
-                        width: '240px',
-                      },
                     }}
                   >
                     <Box
