@@ -8,7 +8,7 @@ test.describe('首頁基本功能測試', () => {
     await page.waitForLoadState('domcontentloaded');
     
     // 檢查頁面標題 - 使用更靈活的匹配
-    await expect(page).toHaveTitle(/大專聖經神學研究班|神研班/);
+    await expect(page).toHaveTitle(/63神研班-2026大專聖經神學研究班|神研班/);
     
     // 檢查主要元素是否存在
     await expect(page.locator('text=63rd神研班').first()).toBeVisible({ timeout: 10000 });

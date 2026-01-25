@@ -241,6 +241,20 @@ export default function Navigation({ currentPage = 'home' }: NavigationProps) {
             </Link>
           </Box>
 
+          {/* 小螢幕：漢堡按鈕開啟側邊選單 */}
+          <IconButton
+            onClick={handleDrawerToggle}
+            sx={{
+              display: 'flex',
+              mr: 1,
+              color: textColor,
+              '@media (min-width: 800px)': { display: 'none' },
+            }}
+            aria-label="開啟選單"
+          >
+            <MenuIcon />
+          </IconButton>
+
           <Box sx={{ display: 'none', '@media (min-width: 800px)': { display: 'flex' }, gap: 0.5, alignItems: 'center' }}>
             
             {/* 63神研選單 */}
