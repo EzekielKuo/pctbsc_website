@@ -118,8 +118,9 @@ export default function QuestionnairePage() {
       <DoorClosed size={120} strokeWidth={1.5} color="white" />
     );
 
+    // 有設定連結即可點擊（不拘門開或關）
     const iconBlock =
-      isOpen && hasLink ? (
+      hasLink ? (
         <Box
           component="a"
           href={link.url}
@@ -150,7 +151,7 @@ export default function QuestionnairePage() {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#000' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#534963' }}>
       <Navigation currentPage="about" />
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Container maxWidth="lg" sx={{ py: 6, mt: 4, color: 'white' }}>

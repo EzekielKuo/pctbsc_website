@@ -57,7 +57,7 @@ export default function JoinPage() {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#000', py: 6 }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#534963', py: 6 }}>
       <Box display="flex" justifyContent="center" px={2}>
         <Card sx={{ width: '100%', maxWidth: 1000, borderRadius: 3, bgcolor: '#0b1a33', boxShadow: '0 10px 40px rgba(0,0,0,0.32)' }}>
           <CardHeader

@@ -95,12 +95,12 @@ export default function Home() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navigation currentPage="home" />
-      <Box component="main" sx={{ flexGrow: 1, bgcolor: '#000000' }}>
+      <Box component="main" sx={{ flexGrow: 1, bgcolor: '#534963' }}>
         {/* 圖片輪播 */}
         <ImageCarousel images={carouselImages} height={400} interval={10000} />
 
         {/* 神研班介紹 Section */}
-        <Box sx={{ mt: -4, bgcolor: '#3d3733' }}>
+        <Box sx={{ mt: -4, bgcolor: '#534963' }}>
           <Container maxWidth="lg" sx={{ py: 6, px: { xs: 2, sm: 3 } }}>
             <Typography
               variant="h4"
@@ -147,7 +147,7 @@ export default function Home() {
                     sx={{
                       width: '100%',
                       aspectRatio: '4/3',
-                      bgcolor: 'rgba(0,0,0,0.35)',
+                      bgcolor: 'rgba(0,0,0,0.25)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',

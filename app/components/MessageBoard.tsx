@@ -77,7 +77,7 @@ export default function MessageBoard() {
         position: 'relative',
         py: 2,
         pb: { xs: 4, md: 2 },
-        backgroundColor: '#000',
+        backgroundColor: '#a7c0d8',
       }}
     >
       <Container maxWidth={false} sx={{ px: { xs: 2, md: 3 } }}>
@@ -87,21 +87,21 @@ export default function MessageBoard() {
               sx={{
               p: { xs: 3, md: 3 },
                 borderRadius: 3,
-              bgcolor: '#000', // 黑色底
-              color: 'white',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+              bgcolor: '#ffffff',
+              color: 'rgba(0, 0, 0, 0.87)',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
                 display: 'flex',
                 flexDirection: 'column',
               gap: 2,
               transition: 'none',
               '&:hover': {
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-                backgroundColor: '#000',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+                backgroundColor: '#ffffff',
                 outline: 'none',
               },
               }}
             >
-            <Typography variant="h5" component="h2" align="center" sx={{ fontWeight: 700, color: 'white' }}>
+            <Typography variant="h5" component="h2" align="center" sx={{ fontWeight: 700, color: 'rgba(0, 0, 0, 0.87)' }}>
               留言反饋
               </Typography>
               <Box component="form" onSubmit={handleSubmit}>
@@ -120,18 +120,18 @@ export default function MessageBoard() {
                     mb: 3,
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
-                    '& fieldset': { borderColor: 'rgba(255,255,255,0.8)', borderWidth: 2 },
-                    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.8)', borderWidth: 2 },
-                    '&.Mui-focused fieldset': { borderColor: 'rgba(255,255,255,0.8)', borderWidth: 2 },
+                    '& fieldset': { borderColor: 'rgba(0,0,0,0.23)', borderWidth: 2 },
+                    '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.4)', borderWidth: 2 },
+                    '&.Mui-focused fieldset': { borderColor: 'primary.main', borderWidth: 2 },
                     },
                     '& .MuiInputBase-input': {
-                    color: 'white',
+                    color: 'rgba(0, 0, 0, 0.87)',
                       resize: 'vertical',
                       maxHeight: '180px',
                       overflowY: 'auto',
                     },
                   '& .MuiInputBase-input::placeholder': {
-                    color: 'rgba(255,255,255,0.7)',
+                    color: 'rgba(0,0,0,0.5)',
                   },
                 }}
               />
