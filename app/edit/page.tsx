@@ -48,6 +48,16 @@ interface QuestionnaireLink {
   url: string;
 }
 
+const INTRO_SECTION_KEYS = ['專講', '工作坊', '小組討論', '小書房', '獻心會'] as const;
+type IntroSectionKey = (typeof INTRO_SECTION_KEYS)[number];
+
+interface IntroSectionImage {
+  id: string;
+  sectionKey: string;
+  url: string;
+  publicId?: string | null;
+}
+
 export default function EditPage() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -74,11 +84,16 @@ export default function EditPage() {
   const [deletingImageId, setDeletingImageId] = useState<string | null>(null);
   const [deleteKeyVisualConfirmOpen, setDeleteKeyVisualConfirmOpen] = useState(false);
   const [deleteScheduleConfirmOpen, setDeleteScheduleConfirmOpen] = useState(false);
+  const [introSectionImages, setIntroSectionImages] = useState<Record<IntroSectionKey, IntroSectionImage | null>>({
+    專講: null,
+    工作坊: null,
+    小組討論: null,
+    小書房: null,
+    獻心會: null,
+  });
+  const [uploadingIntroSection, setUploadingIntroSection] = useState<IntroSectionKey | null>(null);
+  const [deleteIntroSectionConfirm, setDeleteIntroSectionConfirm] = useState<IntroSectionKey | null>(null);
   const [previewImage, setPreviewImage] = useState<{ url: string; title: string } | null>(null);
-  const [aboutBSCContent, setAboutBSCContent] = useState('');
-  const [aboutBSCInitialLoad, setAboutBSCInitialLoad] = useState(true);
-  const [aboutBSCSaving, setAboutBSCSaving] = useState(false);
-  const [aboutBSCSaved, setAboutBSCSaved] = useState(false);
   const [questionnaireInitialLoad, setQuestionnaireInitialLoad] = useState(true);
   const [questionnaireSaving, setQuestionnaireSaving] = useState(false);
   const [questionnaireSaved, setQuestionnaireSaved] = useState(false);
@@ -139,8 +154,8 @@ export default function EditPage() {
           fetchKeyVisual();
           fetchSchedule();
           fetchImages();
+          fetchIntroSectionImages();
           fetchInstagramPosts();
-          fetchAboutBSC();
           fetchQuestionnaireLinks();
         }
       }
@@ -180,6 +195,30 @@ export default function EditPage() {
     } catch (err) {
       console.error('獲取主視覺圖片錯誤:', err);
       setKeyVisual(null);
+    }
+  };
+
+  const fetchIntroSectionImages = async () => {
+    try {
+      const response = await fetch('/api/intro-section-images');
+      const result = await response.json();
+      if (result.success && Array.isArray(result.data)) {
+        const next: Record<IntroSectionKey, IntroSectionImage | null> = {
+          專講: null,
+          工作坊: null,
+          小組討論: null,
+          小書房: null,
+          獻心會: null,
+        };
+        for (const row of result.data as IntroSectionImage[]) {
+          if (INTRO_SECTION_KEYS.includes(row.sectionKey as IntroSectionKey)) {
+            next[row.sectionKey as IntroSectionKey] = row;
+          }
+        }
+        setIntroSectionImages(next);
+      }
+    } catch (err) {
+      console.error('獲取神研班介紹區塊圖片錯誤:', err);
     }
   };
 
@@ -224,20 +263,6 @@ export default function EditPage() {
     }
   };
 
-  const fetchAboutBSC = async () => {
-    try {
-      const response = await fetch('/api/about-bsc');
-      const result = await response.json();
-      if (result.success && result.data) {
-        setAboutBSCContent(result.data.content || '');
-      }
-      setAboutBSCInitialLoad(false);
-    } catch (err) {
-      console.error('獲取「什麼是神研班？」內容錯誤:', err);
-      setAboutBSCInitialLoad(false);
-    }
-  };
-
   const handleUpdateQuestionnaireLink = async (doorIndex: number, url: string) => {
     // 如果 URL 為空，不發送請求
     if (!url || !url.trim()) {
@@ -269,34 +294,6 @@ export default function EditPage() {
       setTimeout(() => setError(''), 3000);
     }
   };
-
-  // 自動儲存「什麼是神研班？」內容
-  useEffect(() => {
-    // 跳過初始載入
-    if (aboutBSCInitialLoad) return;
-
-    // 立即顯示「儲存中...」
-    setAboutBSCSaving(true);
-    setAboutBSCSaved(false);
-
-    // 使用 debounce 延遲保存（1秒後保存）
-    const timer = setTimeout(async () => {
-      try {
-        await fetch('/api/about-bsc', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content: aboutBSCContent }),
-        });
-        setAboutBSCSaving(false);
-        setAboutBSCSaved(true);
-      } catch (err) {
-        console.error('自動保存「什麼是神研班？」內容錯誤:', err);
-        setAboutBSCSaving(false);
-      }
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [aboutBSCContent, aboutBSCInitialLoad]);
 
   // 自動儲存每日問卷連結設定
   useEffect(() => {
@@ -335,35 +332,6 @@ export default function EditPage() {
 
     return () => clearTimeout(timer);
   }, [questionnaireLinks, questionnaireInitialLoad]);
-
-  const handleSaveAboutBSC = async () => {
-    try {
-      setLoading(true);
-      setLoadingMessage('正在保存...');
-      
-      const response = await fetch('/api/about-bsc', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: aboutBSCContent }),
-      });
-
-      const result = await response.json();
-      if (result.success) {
-        setSuccess('保存成功！');
-        setTimeout(() => setSuccess(''), 3000);
-      } else {
-        setError(result.error || '保存失敗');
-        setTimeout(() => setError(''), 3000);
-      }
-    } catch (err) {
-      console.error('保存「什麼是神研班？」內容錯誤:', err);
-      setError('保存失敗');
-      setTimeout(() => setError(''), 3000);
-    } finally {
-      setLoading(false);
-      setLoadingMessage('');
-    }
-  };
 
   const fetchInstagramPosts = async () => {
     try {
@@ -543,6 +511,95 @@ export default function EditPage() {
 
   const handleDeleteSchedule = () => {
     setDeleteScheduleConfirmOpen(true);
+  };
+
+  const handleAddIntroSectionImage = (sectionKey: IntroSectionKey) => {
+    setUploadingIntroSection(sectionKey);
+    setError('');
+    const input = document.getElementById('upload-intro-section-image') as HTMLInputElement;
+    if (input) {
+      input.value = '';
+      input.click();
+    }
+  };
+
+  const handleIntroSectionFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    const sectionKey = uploadingIntroSection;
+    setUploadingIntroSection(null);
+    if (!file || !sectionKey) return;
+    if (!file.type.startsWith('image/')) {
+      setError('只能上傳圖片檔案');
+      return;
+    }
+    try {
+      setUploading(true);
+      setLoadingMessage(`上傳${sectionKey}圖片中...`);
+      setError('');
+      const formData = new FormData();
+      formData.append('file', file);
+      const uploadResponse = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const uploadResult = await uploadResponse.json();
+      if (!uploadResult.success) {
+        setError(uploadResult.error || '上傳失敗');
+        setUploading(false);
+        setLoadingMessage('');
+        return;
+      }
+      const saveResponse = await fetch('/api/intro-section-images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sectionKey,
+          url: uploadResult.data.url,
+          publicId: uploadResult.data.publicId,
+        }),
+      });
+      const saveResult = await saveResponse.json();
+      if (saveResult.success) {
+        await fetchIntroSectionImages();
+      } else {
+        setError(saveResult.error || '保存失敗');
+      }
+    } catch (err) {
+      console.error('上傳神研班介紹區塊圖片錯誤:', err);
+      setError('上傳圖片失敗');
+    } finally {
+      setUploading(false);
+      setLoadingMessage('');
+    }
+  };
+
+  const handleDeleteIntroSectionImage = (sectionKey: IntroSectionKey) => {
+    setDeleteIntroSectionConfirm(sectionKey);
+  };
+
+  const handleConfirmDeleteIntroSection = async () => {
+    const sectionKey = deleteIntroSectionConfirm;
+    setDeleteIntroSectionConfirm(null);
+    if (!sectionKey) return;
+    const image = introSectionImages[sectionKey];
+    if (!image?.id) return;
+    try {
+      setDeleting(true);
+      setLoadingMessage('刪除中...');
+      const response = await fetch(`/api/intro-section-images?id=${image.id}`, { method: 'DELETE' });
+      const result = await response.json();
+      if (result.success) {
+        await fetchIntroSectionImages();
+      } else {
+        setError(result.error || '刪除失敗');
+      }
+    } catch (err) {
+      console.error('刪除神研班介紹區塊圖片錯誤:', err);
+      setError('刪除失敗');
+    } finally {
+      setDeleting(false);
+      setLoadingMessage('');
+    }
   };
 
   const handleConfirmDeleteSchedule = async () => {
@@ -1021,6 +1078,93 @@ export default function EditPage() {
             )}
           </Paper>
 
+          {/* 神研班介紹區塊照片（專講、工作坊、小組討論、小書房、獻心會） */}
+          <Paper sx={{ p: 3, mb: 3 }}>
+            <Typography variant="h6" sx={{ mb: 3 }}>
+              神研班介紹照片
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              用於首頁「神研班介紹」區塊的圖片，可依區塊上傳或更換。
+            </Typography>
+            <Grid container spacing={2}>
+              {INTRO_SECTION_KEYS.map((sectionKey) => {
+                const image = introSectionImages[sectionKey];
+                return (
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }} key={sectionKey}>
+                    <Paper variant="outlined" sx={{ p: 2, height: '100%' }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                        <Typography variant="subtitle1" fontWeight={600}>
+                          {sectionKey}
+                        </Typography>
+                        {image && (
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => handleDeleteIntroSectionImage(sectionKey)}
+                            aria-label={`刪除${sectionKey}圖片`}
+                          >
+                            <Trash2 />
+                          </IconButton>
+                        )}
+                      </Box>
+                      {image ? (
+                        <Box
+                          component="img"
+                          src={image.url}
+                          alt={sectionKey}
+                          onClick={() => handleOpenPreview(image.url, `${sectionKey}圖片`)}
+                          sx={{
+                            width: '100%',
+                            aspectRatio: '4/3',
+                            objectFit: 'cover',
+                            borderRadius: 2,
+                            cursor: 'pointer',
+                          }}
+                        />
+                      ) : (
+                        <Box
+                          onClick={() => handleAddIntroSectionImage(sectionKey)}
+                          sx={{
+                            width: '100%',
+                            aspectRatio: '4/3',
+                            backgroundColor: 'action.hover',
+                            borderRadius: 2,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            border: '2px dashed',
+                            borderColor: 'divider',
+                            '&:hover': {
+                              borderColor: 'primary.main',
+                              bgcolor: 'action.selected',
+                            },
+                          }}
+                        >
+                          <Upload size={32} style={{ color: 'rgba(0,0,0,0.4)', marginBottom: 8 }} />
+                          <Typography variant="caption" color="text.secondary">
+                            點擊上傳
+                          </Typography>
+                        </Box>
+                      )}
+                      {image && (
+                        <Button
+                          size="small"
+                          fullWidth
+                          sx={{ mt: 1 }}
+                          onClick={() => handleAddIntroSectionImage(sectionKey)}
+                        >
+                          更換圖片
+                        </Button>
+                      )}
+                    </Paper>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </Paper>
+
           {/* Instagram 貼文管理 */}
           <Paper sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -1106,39 +1250,6 @@ export default function EditPage() {
                 ))}
               </Grid>
             )}
-          </Paper>
-
-          {/* 什麼是神研班？ */}
-          <Paper sx={{ p: 3, mt: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6">
-                什麼是神研班？
-              </Typography>
-              <Typography 
-                sx={{ 
-                  color: aboutBSCSaving ? 'primary.main' : aboutBSCSaved ? 'success.main' : 'text.disabled',
-                  fontWeight: 700,
-                  fontSize: '0.875rem',
-                  letterSpacing: '0.02857em',
-                  textTransform: 'uppercase',
-                  minWidth: 100,
-                  textAlign: 'center',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                {aboutBSCSaving ? '儲存中...' : aboutBSCSaved ? '儲存完成' : ''}
-              </Typography>
-            </Box>
-            <TextField
-              fullWidth
-              multiline
-              minRows={5}
-              placeholder="請輸入什麼是神研班的描述"
-              value={aboutBSCContent}
-              onChange={(e) => setAboutBSCContent(e.target.value)}
-            />
           </Paper>
             </>
           ) : keyVisualPage === 'bible' ? (
@@ -1354,6 +1465,14 @@ export default function EditPage() {
         type="file"
         onChange={handleScheduleFileSelect}
       />
+      {/* 隱藏的文件輸入，用於神研班介紹區塊圖片 */}
+      <input
+        accept="image/*"
+        style={{ display: 'none' }}
+        id="upload-intro-section-image"
+        type="file"
+        onChange={handleIntroSectionFileSelect}
+      />
 
       {/* 刪除輪播圖片確認對話框 */}
       <Dialog
@@ -1389,6 +1508,32 @@ export default function EditPage() {
             variant="contained"
             color="error"
           >
+            確定刪除
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 刪除神研班介紹區塊圖片確認對話框 */}
+      <Dialog
+        open={deleteIntroSectionConfirm !== null}
+        onClose={() => setDeleteIntroSectionConfirm(null)}
+        aria-labelledby="delete-intro-section-confirm-dialog-title"
+        PaperProps={{
+          sx: {
+            minWidth: 300,
+            textAlign: 'center',
+            p: 3,
+          },
+        }}
+      >
+        <DialogTitle id="delete-intro-section-confirm-dialog-title" sx={{ pb: 1 }}>
+          確定要刪除「{deleteIntroSectionConfirm}」的照片嗎？
+        </DialogTitle>
+        <DialogActions sx={{ justifyContent: 'center', gap: 2, pt: 2 }}>
+          <Button onClick={() => setDeleteIntroSectionConfirm(null)} variant="outlined">
+            取消
+          </Button>
+          <Button onClick={handleConfirmDeleteIntroSection} variant="contained" color="error">
             確定刪除
           </Button>
         </DialogActions>
