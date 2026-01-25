@@ -36,9 +36,13 @@ const INTRO_SECTIONS: IntroSection[] = [
   },
 ];
 
+type IntroSectionImageMap = Record<string, string>;
+
 export default function Home() {
   // 輪播圖片
   const [carouselImages, setCarouselImages] = useState<string[]>([]);
+  // 神研班介紹區塊圖片（專講、工作坊、小組討論、小書房、獻心會）
+  const [introSectionImages, setIntroSectionImages] = useState<IntroSectionImageMap>({});
 
   useEffect(() => {
     const fetchCarouselImages = async () => {
@@ -53,6 +57,25 @@ export default function Home() {
       }
     };
     fetchCarouselImages();
+  }, []);
+
+  useEffect(() => {
+    const fetchIntroSectionImages = async () => {
+      try {
+        const response = await fetch('/api/intro-section-images');
+        const result = await response.json();
+        if (result.success && Array.isArray(result.data)) {
+          const map: IntroSectionImageMap = {};
+          for (const row of result.data as { sectionKey: string; url: string }[]) {
+            map[row.sectionKey] = row.url;
+          }
+          setIntroSectionImages(map);
+        }
+      } catch (err) {
+        console.error('獲取神研班介紹區塊圖片錯誤:', err);
+      }
+    };
+    fetchIntroSectionImages();
   }, []);
 
   // 聯絡資訊
@@ -130,9 +153,23 @@ export default function Home() {
                       justifyContent: 'center',
                       color: 'rgba(255,255,255,0.4)',
                       fontSize: '0.875rem',
+                      overflow: 'hidden',
                     }}
                   >
-                    照片待放置
+                    {introSectionImages[section.title] ? (
+                      <Box
+                        component="img"
+                        src={introSectionImages[section.title]}
+                        alt={section.title}
+                        sx={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                        }}
+                      />
+                    ) : (
+                      '照片待放置'
+                    )}
                   </Box>
                 </Box>
 

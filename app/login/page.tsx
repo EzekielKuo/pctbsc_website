@@ -35,11 +35,10 @@ export default function LoginPage() {
     setError('');
     setSuccess('');
 
-    // 帳號和密碼為非必填，允許空值提交
-    const isValid = username === ' ' && password === ' ';
-    const isGuest = (!username.trim() && !password.trim()) || (username.trim() === '' && password.trim() === '');
-    
-    if (isValid || isGuest) {
+    // 帳號與密碼均為 admin
+    const isValid = username === 'admin' && password === 'admin';
+
+    if (isValid) {
       localStorage.setItem('isLoggedIn', 'true');
       localStorage.setItem('loginTime', Date.now().toString());
       localStorage.setItem('isAdmin', 'true');
