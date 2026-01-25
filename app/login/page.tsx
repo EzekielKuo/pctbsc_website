@@ -36,7 +36,7 @@ export default function LoginPage() {
     setSuccess('');
 
     // 帳號與密碼均為 admin
-    const isValid = username === 'admin' && password === 'admin';
+    const isValid = username === 'admin' && password === 'pctbsc';
 
     if (isValid) {
       localStorage.setItem('isLoggedIn', 'true');
@@ -119,7 +119,7 @@ export default function LoginPage() {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#1a1a1a', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#534963', display: 'flex', flexDirection: 'column' }}>
       <Navigation currentPage="login" />
       <Box
         component="main"
@@ -130,7 +130,7 @@ export default function LoginPage() {
           justifyContent: 'center',
           py: 6,
           px: 2,
-          bgcolor: '#000000',
+          bgcolor: '#534963',
         }}
       >
         <Box sx={{ width: '100%', maxWidth: '520px', px: 3 }}>

@@ -36,7 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-TW">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} style={{ backgroundColor: '#000000' }}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} style={{ backgroundColor: '#534963' }}>
         <GoogleAnalytics />
         <PageViewTracker />
         <PageTimeTracker />

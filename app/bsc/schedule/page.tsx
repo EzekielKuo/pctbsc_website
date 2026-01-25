@@ -39,7 +39,7 @@ export default function SchedulePage() {
   ];
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#000' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#534963' }}>
       <Navigation currentPage="about" />
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Container maxWidth="lg" sx={{ py: 6, mt: 4, color: 'white' }}>
@@ -53,7 +53,7 @@ export default function SchedulePage() {
               px: { xs: 2, md: 10 },
               py: 0,
               borderRadius: 2,
-              bgcolor: '#000',
+              bgcolor: '#534963',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',

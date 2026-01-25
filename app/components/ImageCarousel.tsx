@@ -17,6 +17,8 @@ export default function ImageCarousel({
 }: ImageCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  // 每張圖的寬高比，讓容器隨目前圖片與螢幕寬度貼合上下緣
+  const [aspectRatios, setAspectRatios] = useState<Record<number, number>>({});
 
   // 重置計時器的函數
   const resetTimer = useCallback((isAuto: boolean = true) => {
@@ -65,7 +67,7 @@ export default function ImageCarousel({
             height: typeof height === 'number' ? `${height}px` : height,
             borderRadius: 2,
             overflow: 'hidden',
-            bgcolor: 'black',
+            bgcolor: '#a7c0d8',
           }}
         />
       </Container>
@@ -95,13 +97,17 @@ export default function ImageCarousel({
             width: '100%',
             borderRadius: 2,
             overflow: 'hidden',
-            bgcolor: 'black',
+            bgcolor: '#a7c0d8',
             boxShadow: 2,
-            minHeight: typeof height === 'number' ? `${height}px` : height,
+            // 依目前圖片比例隨螢幕寬度改變高度，貼合圖片上下緣
+            aspectRatio: aspectRatios[currentIndex] ?? (typeof height === 'number' ? 1600 / height : 4),
+            maxHeight: typeof height === 'number' ? `${height}px` : height,
           }}
         >
           <Box
             sx={{
+              position: 'absolute',
+              inset: 0,
               display: 'flex',
               width: `${images.length * 100}%`,
               height: '100%',
@@ -117,7 +123,7 @@ export default function ImageCarousel({
                   height: '100%',
                   flexShrink: 0,
                   display: 'flex',
-                  alignItems: 'flex-start',
+                  alignItems: 'stretch',
                   justifyContent: 'center',
                   position: 'relative',
                 }}
@@ -128,32 +134,15 @@ export default function ImageCarousel({
                   alt={`輪播圖片 ${index + 1}`}
                   className="carousel-image"
                   sx={{
-                    maxWidth: '100%',
-                    maxHeight: '100%',
-                    width: 'auto',
-                    height: 'auto',
+                    width: '100%',
+                    height: '100%',
                     objectFit: 'contain',
                     display: 'block',
                   }}
                   onLoad={(e) => {
-                    // 動態調整容器高度以適應當前顯示的圖片
-                    if (index === currentIndex) {
-                      const img = e.currentTarget;
-                      const container = img.closest('.carousel-container') as HTMLElement;
-                      if (container) {
-                        const aspectRatio = img.naturalWidth / img.naturalHeight;
-                        const containerWidth = container.offsetWidth;
-                        const calculatedHeight = containerWidth / aspectRatio;
-                        const maxHeight = typeof height === 'number' ? height : parseInt(height.toString().replace('px', ''));
-                        
-                        // 如果計算出的高度小於最大高度，使用計算出的高度；否則使用最大高度
-                        if (calculatedHeight > 0 && calculatedHeight < maxHeight) {
-                          container.style.height = `${calculatedHeight}px`;
-                        } else {
-                          container.style.height = `${maxHeight}px`;
-                        }
-                      }
-                    }
+                    const img = e.currentTarget;
+                    const ratio = img.naturalWidth / img.naturalHeight;
+                    setAspectRatios((prev) => ({ ...prev, [index]: ratio }));
                   }}
                 />
               </Box>

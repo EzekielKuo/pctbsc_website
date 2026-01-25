@@ -38,7 +38,7 @@ export default function InfoPage() {
   ];
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#000' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#534963' }}>
       <Navigation currentPage="about" />
       <Box component="main" sx={{ flexGrow: 1 }}>
         <KeyVisual imageUrl={keyVisualUrl} />
