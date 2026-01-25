@@ -25,8 +25,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: '大專聖經神學研究班',
-  description: '大專聖經神學研究班營會網站，提供報名資訊、營會介紹、FAQ等相關資訊',
+  title: '63神研班-2026大專聖經神學研究班',
+  description: '63神研班-2026大專聖經神學研究班營會網站，提供報名資訊、營會介紹、FAQ等相關資訊',
 };
 
 export default function RootLayout({
