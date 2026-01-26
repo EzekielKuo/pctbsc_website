@@ -14,33 +14,43 @@ declare global {
   }
 }
 
-// 頁面瀏覽追蹤
-export const pageview = (url: string) => {
+// 頁面瀏覽追蹤（傳入 page_title 讓 GA4「網頁標題」報表能依頁面區分）
+export const pageview = (url: string, pageTitle?: string) => {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('config', GA_MEASUREMENT_ID || '', {
       page_path: url,
+      ...(pageTitle != null && pageTitle !== '' && { page_title: pageTitle }),
     });
   }
 };
 
-// 事件追蹤
-export const event = ({
-  action,
-  category,
-  label,
-  value,
-}: {
-  action: string;
-  category: string;
-  label?: string;
-  value?: number;
-}) => {
+// 事件追蹤（可傳入額外參數，例如 page_path 以便在 GA4 依頁面區分）
+export const event = (
+  {
+    action,
+    category,
+    label,
+    value,
+  }: {
+    action: string;
+    category: string;
+    label?: string;
+    value?: number;
+  },
+  extra?: Record<string, string | number | boolean | undefined>
+) => {
   if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', action, {
+    const params: Record<string, unknown> = {
       event_category: category,
       event_label: label,
       value: value,
-    });
+    };
+    if (extra) {
+      Object.entries(extra).forEach(([k, v]) => {
+        if (v !== undefined) params[k] = v;
+      });
+    }
+    window.gtag('event', action, params);
   }
 };
 
