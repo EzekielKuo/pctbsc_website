@@ -39,8 +39,8 @@ export const metadata: Metadata = {
     '台灣基督長老教會營隊'
   ],
   icons: {
-    icon: '/logo.png',
-    apple: '/logo.png',
+    icon: '/logo.jpg',
+    apple: '/logo.jpg',
   },
   openGraph: {
     title: '63神研班-2026大專聖經神學研究班',
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     siteName: '神研班官網',
     images: [
       {
-        url: 'https://pctbsc-website.vercel.app/logo.png',
+        url: 'https://pctbsc-website.vercel.app/logo.jpg',
         width: 512,
         height: 512,
         alt: '63神研班 Logo - 台灣基督長老教會',
