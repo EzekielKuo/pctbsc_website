@@ -20,12 +20,10 @@ export default function usePageTime() {
       const timeSpent = Math.round((Date.now() - startTimeRef.current) / 1000); // 轉換為秒
       
       if (timeSpent > 0) {
-        event({
-          action: 'page_time',
-          category: 'engagement',
-          label: pathnameRef.current,
-          value: timeSpent,
-        });
+        event(
+          { action: 'page_time', category: 'engagement', label: pathnameRef.current, value: timeSpent },
+          { page_path: pathnameRef.current }
+        );
       }
     }
 
@@ -43,6 +41,7 @@ export default function usePageTime() {
             event_category: 'engagement',
             event_label: pathnameRef.current,
             value: timeSpent,
+            page_path: pathnameRef.current,
           });
         }
       }
@@ -56,12 +55,10 @@ export default function usePageTime() {
       // 組件卸載時也記錄停留時間
       const timeSpent = Math.round((Date.now() - startTimeRef.current) / 1000);
       if (timeSpent > 0 && pathnameRef.current) {
-        event({
-          action: 'page_time',
-          category: 'engagement',
-          label: pathnameRef.current,
-          value: timeSpent,
-        });
+        event(
+          { action: 'page_time', category: 'engagement', label: pathnameRef.current, value: timeSpent },
+          { page_path: pathnameRef.current }
+        );
       }
     };
   }, [pathname]);
