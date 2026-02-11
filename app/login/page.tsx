@@ -36,7 +36,7 @@ export default function LoginPage() {
     setSuccess('');
 
     // 帳號與密碼均為 admin
-    const isValid = username === 'admin' && password === 'pctbsc';
+    const isValid = username === 'pctbsc' && password === 'ilovejesus520';
 
     if (isValid) {
       localStorage.setItem('isLoggedIn', 'true');
